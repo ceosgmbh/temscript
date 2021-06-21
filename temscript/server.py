@@ -134,6 +134,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_projection_mode_string()
         elif endpoint == "magnification_index":
             response = self.server.microscope.get_magnification_index()
+        elif endpoint == "stem_magnification":
+            response = self.server.microscope.get_stem_magnification()
         elif endpoint == "indicated_camera_length":
             response = self.server.microscope.get_indicated_camera_length()
         elif endpoint == "indicated_magnification":
@@ -196,6 +198,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_projection_mode(decoded_content)
         elif endpoint == "magnification_index":
             self.server.microscope.set_magnification_index(decoded_content)
+        elif endpoint == "stem_magnification":
+            self.server.microscope.set_stem_magnification(decoded_content)
         elif endpoint == "defocus":
             self.server.microscope.set_defocus(decoded_content)
         elif endpoint == "intensity":
@@ -253,7 +257,6 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
                            self.path, traceback.format_exc())
             self.send_error(500, "Error handling request: %s" % self.path)
 
-
 class MicroscopeServer(HTTPServer, object):
     def __init__(self, *args, **kw):
         microscope_factory = kw.pop("microscope_factory", None)
@@ -261,6 +264,15 @@ class MicroscopeServer(HTTPServer, object):
             from .microscope import Microscope
             microscope_factory = Microscope
         super(MicroscopeServer, self).__init__(*args, **kw)
+        self.microscope = microscope_factory()
+
+class NullMicroscopeServer(HTTPServer, object):
+    def __init__(self, *args, **kw):
+        microscope_factory = kw.pop("microscope_factory", None)
+        if microscope_factory is None:
+            from .null_microscope import NullMicroscope
+            microscope_factory = NullMicroscope
+        super(NullMicroscopeServer, self).__init__(*args, **kw)
         self.microscope = microscope_factory()
 
 
@@ -285,7 +297,6 @@ def run_server(argv=None, microscope_factory=None):
         server = MicroscopeServer((args.host, args.port), MicroscopeHandler, microscope_factory=microscope_factory)
         print("Started httpserver on host '%s' port %d." % (args.host, args.port))
         print("Press Ctrl+C to stop server.")
-
         # Wait forever for incoming htto requests
         server.serve_forever()
 

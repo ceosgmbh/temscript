@@ -46,6 +46,7 @@ class NullMicroscope(object):
         self._projection_sub_mode = ProjectionSubMode.SA
         self._projection_mode = ProjectionMode.IMAGING
         self._magnification_index = 10
+        self._stem_magnification = 5000.0
         self._defocus = 0.0
         self._intensity = 0.0
 
@@ -205,6 +206,12 @@ class NullMicroscope(object):
 
     def set_magnification_index(self, index):
         self._magnification_index = index
+
+    def get_stem_magnification(self):
+        return self._stem_magnification
+
+    def set_stem_magnification(self, index):
+        self._stem_magnification = index
 
     def get_indicated_camera_length(self):
         if self._projection_mode == ProjectionMode.DIFFRACTION:

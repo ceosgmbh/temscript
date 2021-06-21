@@ -543,6 +543,26 @@ class Microscope(object):
         index = int(index)
         self._tem_projection.ProjectionIndex = index
 
+    def get_stem_magnification(self):
+        """
+        Return STEM magnification value.
+
+        .. versionadded:: 1.0.10
+        """
+        return self._tem_illumination.StemMagnification
+
+    def set_stem_magnification(self, value):
+        """
+        Set STEM magnification value.
+
+        :param value: Magnification/Camera length index
+        :type value: float
+
+        .. versionadded:: 1.0.10
+        """
+        value = float(value)
+        self._tem_illumination.StemMagnification = value
+
     def get_indicated_camera_length(self):
         """
         Get (indicated) camera length in meters in diffraction modes. If microscope is in imaging mode, 0 is returned.

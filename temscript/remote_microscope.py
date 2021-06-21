@@ -234,6 +234,15 @@ class RemoteMicroscope(object):
         self._request("PUT", "/v1/magnification_index", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 
+    def get_stem_magnification(self):
+        response, body = self._request("GET", "/v1/stem_magnification")
+        return body
+
+    def set_stem_magnification(self, stem_mag):
+        content = json.dumps(stem_mag).encode("utf-8")
+        self._request("PUT", "/v1/stem_magnification", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
     def get_indicated_camera_length(self):
         response, body = self._request("GET", "/v1/indicated_camera_length")
         return body
