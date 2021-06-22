@@ -478,6 +478,12 @@ class Microscope(object):
         """
         return self._tem_illumination.Mode
 
+    def get_spot_size_index(self):
+        """
+        Return the spot size index as an integer.
+        """
+        return self._tem_illumination.SpotSizeIndex
+
     def normalize(self, mode="ALL"):
         """
         Normalize some or all lenses.
