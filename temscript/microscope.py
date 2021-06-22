@@ -450,6 +450,28 @@ class Microscope(object):
         else:
             self._tem_illumination.Tilt = tilt
 
+    def get_df_mode(self):
+        """
+        Return dark field mode as an integer number.
+        See class DarkFieldMode:
+            dfOff = 1
+            dfCartesian = 2
+            dfConical = 3
+        """
+        return self._tem_illumination.DFMode
+
+    def set_df_mode(self, df_mode):
+        """
+        Set dark field mode.
+        :param df_mode The dark field mode
+            See class DarkFieldMode:
+                dfOff = 1
+                dfCartesian = 2
+                dfConical = 3
+        :type df_mode int
+        """
+        self._tem_illumination.DFMode = df_mode
+
     def normalize(self, mode="ALL"):
         """
         Normalize some or all lenses.

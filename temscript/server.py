@@ -126,6 +126,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_beam_shift()
         elif endpoint == "beam_tilt":
             response = self.server.microscope.get_beam_tilt()
+        elif endpoint == "df_mode":
+            response = self.server.microscope.get_df_mode()
         elif endpoint == "projection_sub_mode":
             response = self.server.microscope.get_projection_sub_mode()
         elif endpoint == "projection_mode":
@@ -198,6 +200,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_beam_shift(decoded_content)
         elif endpoint == "beam_tilt":
             self.server.microscope.set_beam_tilt(decoded_content)
+        elif endpoint == "df_mode":
+            self.server.microscope.set_df_mode(decoded_content)
         elif endpoint == "projection_mode":
             self.server.microscope.set_projection_mode(decoded_content)
         elif endpoint == "magnification_index":

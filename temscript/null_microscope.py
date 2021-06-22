@@ -40,6 +40,7 @@ class NullMicroscope(object):
         self._image_shift = np.zeros(2, dtype=float)
         self._beam_shift = np.zeros(2, dtype=float)
         self._beam_tilt = np.zeros(2, dtype=float)
+        self._df_mode = DarkFieldMode.CARTESIAN
         self._condenser_stigmator = np.zeros(2, dtype=float)
         self._objective_stigmator = np.zeros(2, dtype=float)
         self._diffraction_shift = np.zeros(2, dtype=float)
@@ -181,6 +182,12 @@ class NullMicroscope(object):
     def set_beam_tilt(self, tilt):
         tilt = np.atleast_1d(tilt)
         self._beam_tilt[...] = tilt
+
+    def get_df_mode(self):
+        return self._df_mode
+
+    def set_df_mode(self, df_mode):
+        self.df_mode = df_mode
 
     def normalize(self, mode="ALL"):
         KNOWN_MODES = ["SPOTSIZE", "INTENSITY", "CONDENSER", "MINI_CONDENSER", "OBJECTIVE", "PROJECTOR",

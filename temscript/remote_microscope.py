@@ -172,6 +172,15 @@ class RemoteMicroscope(object):
         self._request("PUT", "/v1/beam_tilt", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 
+    def get_df_mode(self):
+        response, body = self._request("GET", "/v1/df_mode")
+        return body
+
+    def set_df_mode(self, df_mode):
+        content = json.dumps(tuple(df_mode)).encode("utf-8")
+        self._request("PUT", "/v1/df_mode", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
     allowed_types = {"INT8", "INT16", "INT32", "INT64", "UINT8", "UINT16", "UINT32", "UINT64", "FLOAT32", "FLOAT64"}
     allowed_endianness = {"LITTLE", "BIG"}
 
