@@ -744,6 +744,20 @@ class Microscope(object):
         """
         return self._tem_projection.DiffractionShift
 
+    def get_beam_blanked(self):
+        """
+        Get beam blanker status (True: Beam is blanked)
+        """
+        return self._tem_illumination.BeamBlanked
+
+    def set_beam_blanked(self, beam_blanked):
+        """
+        Blank the beam.
+        :param beam_blanked True: Blank the beam..
+        :type beam_blanked bool
+        """
+        self._tem_illumination.BeamBlanked = beam_blanked
+
     def get_optics_state(self):
         """
         Return a dictionary with state of microscope optics.

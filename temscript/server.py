@@ -162,6 +162,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_diffraction_shift()
         elif endpoint == "optics_state":
             response = self.server.microscope.get_optics_state()
+        elif endpoint == "beam_blanked":
+            response = self.server.microscope.get_beam_blanked()
         elif endpoint.startswith("detector_param/"):
             try:
                 name = endpoint[15:]
@@ -224,6 +226,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_objective_stigmator(decoded_content)
         elif endpoint == "condenser_stigmator":
             self.server.microscope.set_condenser_stigmator(decoded_content)
+        elif endpoint == "beam_blanked":
+            self.server.microscope.set_beam_blanked(decoded_content)
         elif endpoint.startswith("detector_param/"):
             try:
                 name = endpoint[15:]

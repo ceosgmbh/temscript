@@ -53,6 +53,7 @@ class NullMicroscope(object):
         self._stem_magnification = 5000.0
         self._defocus = 0.0
         self._intensity = 0.0
+        self._beam_blanked = False
 
     def get_family(self):
         return "NULL"
@@ -190,7 +191,13 @@ class NullMicroscope(object):
         return self._df_mode
 
     def set_df_mode(self, df_mode):
-        self.df_mode = df_mode
+        self._df_mode = df_mode
+
+    def get_beam_blanked(self):
+        return self._beam_blanked
+
+    def set_beam_blanked(self, beam_blanked):
+        self._beam_blanked = beam_blanked
 
     def normalize(self, mode="ALL"):
         KNOWN_MODES = ["SPOTSIZE", "INTENSITY", "CONDENSER", "MINI_CONDENSER", "OBJECTIVE", "PROJECTOR",

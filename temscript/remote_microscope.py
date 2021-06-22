@@ -177,8 +177,17 @@ class RemoteMicroscope(object):
         return body
 
     def set_df_mode(self, df_mode):
-        content = json.dumps(tuple(df_mode)).encode("utf-8")
+        content = json.dumps(df_mode).encode("utf-8")
         self._request("PUT", "/v1/df_mode", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
+    def get_beam_blanked(self):
+        response, body = self._request("GET", "/v1/beam_blanked")
+        return body
+
+    def set_beam_blanked(self, beam_blanked):
+        content = json.dumps(beam_blanked).encode("utf-8")
+        self._request("PUT", "/v1/beam_blanked", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 
     def get_spot_size_index(self):
