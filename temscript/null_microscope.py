@@ -47,6 +47,7 @@ class NullMicroscope(object):
         self._projection_sub_mode = ProjectionSubMode.SA
         self._projection_mode = ProjectionMode.IMAGING
         self._illumination_mode = 0
+        self._condenser_mode = 1
         self._spot_size_index = 3
         self._magnification_index = 10
         self._stem_magnification = 5000.0
@@ -212,6 +213,9 @@ class NullMicroscope(object):
 
     def get_illumination_mode(self):
         return self._illumination_mode
+
+    def get_condenser_mode(self):
+        return self._condenser_mode
 
     def get_spot_size_index(self):
         return self._spot_size_index
