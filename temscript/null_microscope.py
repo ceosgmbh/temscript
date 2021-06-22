@@ -46,6 +46,7 @@ class NullMicroscope(object):
         self._diffraction_shift = np.zeros(2, dtype=float)
         self._projection_sub_mode = ProjectionSubMode.SA
         self._projection_mode = ProjectionMode.IMAGING
+        self._illumination_mode = 0
         self._magnification_index = 10
         self._stem_magnification = 5000.0
         self._defocus = 0.0
@@ -208,6 +209,9 @@ class NullMicroscope(object):
     def get_projection_mode_string(self):
         return "SA"
 
+    def get_illumination_mode(self):
+        return self._illumination_mode
+
     def get_magnification_index(self):
         return self._magnification_index
 
@@ -293,3 +297,5 @@ class NullMicroscope(object):
             "diffraction_shift": self.get_diffraction_shift(),
         }
         return state
+
+

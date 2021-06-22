@@ -472,6 +472,12 @@ class Microscope(object):
         """
         self._tem_illumination.DFMode = df_mode
 
+    def get_illumination_mode(self):
+        """
+        Return the illumination mode as an integer.
+        """
+        return self._tem_illumination.Mode
+
     def normalize(self, mode="ALL"):
         """
         Normalize some or all lenses.

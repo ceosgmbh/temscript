@@ -134,6 +134,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_projection_mode()
         elif endpoint == "projection_mode_string":
             response = self.server.microscope.get_projection_mode_string()
+        elif endpoint == "illumination_mode":
+            response = self.server.microscope.get_illumination_mode()
         elif endpoint == "magnification_index":
             response = self.server.microscope.get_magnification_index()
         elif endpoint == "stem_magnification":
@@ -275,6 +277,15 @@ class MicroscopeServer(HTTPServer, object):
         self.microscope = microscope_factory()
 
 class NullMicroscopeServer(HTTPServer, object):
+    """
+    For testing the RemoteMicroscope class against a NullMicroscope
+    via the remote interface.
+
+    Startup script:
+        from temscript import server
+        temscripting_server = server.NullMicroscopeServer(("127.0.0.1", 8080), server.MicroscopeHandler)
+        temscripting_server.serve_forever()
+    """
     def __init__(self, *args, **kw):
         microscope_factory = kw.pop("microscope_factory", None)
         if microscope_factory is None:
