@@ -478,6 +478,22 @@ class Microscope(object):
         """
         return self._tem_illumination.Mode
 
+    def get_illuminated_area(self):
+        """
+        :return Return the size of the illuminated area (in meters).
+            Accessible only in Parallel mode. Type: double
+        """
+        return self._tem_illumination.IlluminatedArea
+
+    def set_illuminated_area(self, illuminated_area):
+        """
+        Set the size of the illuminated area (in meters).
+            Accessible only in Parallel mode.
+        :param illuminated_area the size of the illuminated area (in meters).
+        :type illuminated_area double
+        """
+        self._tem_illumination.IlluminatedArea = illuminated_area
+
     def get_condenser_mode(self):
         """
         Return the condenser mode as an integer.

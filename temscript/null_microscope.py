@@ -47,6 +47,7 @@ class NullMicroscope(object):
         self._projection_sub_mode = ProjectionSubMode.SA
         self._projection_mode = ProjectionMode.IMAGING
         self._illumination_mode = 0
+        self._illuminated_area = 0.0
         self._condenser_mode = 1
         self._spot_size_index = 3
         self._magnification_index = 10
@@ -192,6 +193,12 @@ class NullMicroscope(object):
 
     def set_df_mode(self, df_mode):
         self._df_mode = df_mode
+
+    def get_illuminated_area(self):
+        return self._illuminated_area
+
+    def set_illuminated_area(self, illuminated_area):
+        self._illuminated_area = illuminated_area
 
     def get_beam_blanked(self):
         return self._beam_blanked
