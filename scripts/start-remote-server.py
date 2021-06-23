@@ -1,6 +1,6 @@
 from temscript import server
 
-# requires Titan installation
+# to be started on the Titan microscope PC
 print("Starting temscripting Microscope REST Server...")
 try:
     # start dummy server on localhost, port 8080

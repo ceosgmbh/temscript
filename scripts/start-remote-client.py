@@ -1,10 +1,10 @@
 from temscript.remote_microscope import RemoteMicroscope
-from temscript.microscope import DarkFieldMode
 
+# may be started on a PC different from the Titan microscope PC, e.g. the camera PC
+# it is assumed that on this PC either `start-remote-server.py` or `start-remote-dummy-server.py` have been started
+# in this case SERVER_HOST has to be changed to the IP of the microscope PC
 print("Starting Temscripting Microscope HTTP Client...")
-#try:
 SERVER_PORT = 8080
-#SERVER_HOST = 'localhost'
 SERVER_HOST = '127.0.0.1'
 TRANSPORT = "JSON" # "PICKLE"
 client = RemoteMicroscope((SERVER_HOST, SERVER_PORT), transport=TRANSPORT)
@@ -15,8 +15,6 @@ print("projection_mode_string=%s" % client.get_projection_mode_string())
 print("magnification_index=%s" % client.get_magnification_index())
 print("indicated_magnification=%s" % client.get_indicated_magnification())
 print("indicated_camera_length=%s" % client.get_indicated_camera_length())
-# response, body = client._request("GET", "/v1/stem_magnification")
-# print("stem_magnification=%s" % body)
 print("stem_magnification=%s" % client.get_stem_magnification())
 print("Changing stem_magnification...")
 client.set_stem_magnification(6000.0)
@@ -37,9 +35,9 @@ print("beam_blanked=%s" % client.get_beam_blanked())
 print("family=%s" % client.get_family())
 print("stage_holder=%s" % client.get_stage_holder())
 print("stage_position=%s" % client.get_stage_position())
+print("illuminated_area=%s" % client.get_illuminated_area())
+print("Changing illuminated_area...")
+client.set_illuminated_area(1.0)
+print("illuminated_area=%s" % client.get_illuminated_area())
 
-# except Exception as exc:
-#     print("Caught exception %s" % exc)
-
- 
 print("Done.")
