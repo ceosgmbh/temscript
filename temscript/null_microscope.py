@@ -53,6 +53,7 @@ class NullMicroscope(object):
         self._magnification_index = 10
         self._stem_magnification = 5000.0
         self._defocus = 0.0
+        self._probe_defocus = 0.0
         self._intensity = 0.0
         self._beam_blanked = False
 
@@ -263,6 +264,12 @@ class NullMicroscope(object):
 
     def set_defocus(self, value):
         self._defocus = float(value)
+
+    def get_probe_defocus(self):
+        return self._probe_defocus
+
+    def set_probe_defocus(self, probe_defocus):
+        self._probe_defocus = float(probe_defocus)
 
     def get_objective_excitation(self):
         return self._defocus

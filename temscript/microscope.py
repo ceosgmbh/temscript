@@ -673,6 +673,27 @@ class Microscope(object):
         """
         self._tem_projection.Focus = float(value)
 
+    def get_probe_defocus(self):
+        """
+        Get probe defocus. Returns the amount of probe defocus (in meters). Accessible
+        only in Probe mode.
+
+        .. versionadded:: 1.0.14
+        """
+        return self._tem_projection.ProbeDefocus
+
+    def set_probe_defocus(self, probe_defocus):
+        """
+        Sets Returns the amount of probe defocus (in meters). Accessible
+        only in Probe mode.
+
+        :param probe_defocus: Defocus to set
+        :type probe_defocus: float
+
+        .. versionadded:: 1.0.14
+        """
+        self._tem_projection.ProbeDefocus = float(probe_defocus)
+
     def get_objective_excitation(self):
         """
         Excitation of objective lens.

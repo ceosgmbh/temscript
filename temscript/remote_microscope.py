@@ -299,6 +299,15 @@ class RemoteMicroscope(object):
         self._request("PUT", "/v1/defocus", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 
+    def get_probe_defocus(self):
+        response, body = self._request("GET", "/v1/probe_defocus")
+        return body
+
+    def set_probe_defocus(self, probe_defocus):
+        content = json.dumps(probe_defocus).encode("utf-8")
+        self._request("PUT", "/v1/probe_defocus", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
     def get_objective_excitation(self):
         response, body = self._request("GET", "/v1/objective_excitation")
         return body

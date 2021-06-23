@@ -152,6 +152,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_indicated_magnification()
         elif endpoint == "defocus":
             response = self.server.microscope.get_defocus()
+        elif endpoint == "probe_defocus":
+            response = self.server.microscope.get_probe_defocus()
         elif endpoint == "objective_excitation":
             response = self.server.microscope.get_objective_excitation()
         elif endpoint == "intensity":
@@ -222,6 +224,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_stem_magnification(decoded_content)
         elif endpoint == "defocus":
             self.server.microscope.set_defocus(decoded_content)
+        elif endpoint == "probe_defocus":
+            self.server.microscope.set_probe_defocus(decoded_content)
         elif endpoint == "intensity":
             self.server.microscope.set_intensity(decoded_content)
         elif endpoint == "diffraction_shift":
