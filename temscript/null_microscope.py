@@ -40,6 +40,7 @@ class NullMicroscope(object):
         self._image_shift = np.zeros(2, dtype=float)
         self._beam_shift = np.zeros(2, dtype=float)
         self._beam_tilt = np.zeros(2, dtype=float)
+        self._instrument_mode = InstrumentMode.TEM
         self._df_mode = DarkFieldMode.CARTESIAN
         self._condenser_stigmator = np.zeros(2, dtype=float)
         self._objective_stigmator = np.zeros(2, dtype=float)
@@ -215,6 +216,12 @@ class NullMicroscope(object):
                        "OBJECTIVE_CONDENSER", "OBJECTIVE_PROJECTOR", "ALL"]
         if mode.upper() not in KNOWN_MODES:
             raise ValueError("Unknown normalization mode: %s" % mode)
+
+    def get_instrument_mode(self):
+        return self._instrument_mode
+
+    def get_instrument_mode_string(self):
+        return InstrumentMode(self._instrument_mode).name
 
     def get_projection_sub_mode(self):
         return ProjectionSubMode(self._projection_sub_mode)

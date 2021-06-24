@@ -450,6 +450,19 @@ class Microscope(object):
         else:
             self._tem_illumination.Tilt = tilt
 
+    def get_instrument_mode(self):
+        """
+        Return the instrument mode as an integer.
+        """
+        return self._tem_instrument.InstrumentMode
+
+    def get_instrument_mode_string(self):
+        """
+        Return illumination mode as a string.
+        See class IlluminationMode: possible values are "TEM" and "STEM"
+        """
+        return InstrumentMode(self._tem_instrument.InstrumentMode).name
+
     def get_df_mode(self):
         """
         Return dark field mode as an integer number.

@@ -126,6 +126,10 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_beam_shift()
         elif endpoint == "beam_tilt":
             response = self.server.microscope.get_beam_tilt()
+        elif endpoint == "instrument_mode":
+            response = self.server.microscope.get_instrument_mode()
+        elif endpoint == "instrument_mode_string":
+            response = self.server.microscope.get_instrument_mode_string()
         elif endpoint == "df_mode":
             response = self.server.microscope.get_df_mode()
         elif endpoint == "df_mode_string":

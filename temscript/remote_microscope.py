@@ -234,6 +234,15 @@ class RemoteMicroscope(object):
         self._request("PUT", "/v1/acquire", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 
+    def get_instrument_mode(self):
+        response, body = self._request("GET", "/v1/instrument_mode")
+        return body
+
+    def get_instrument_mode_string(self):
+        response, body = self._request("GET", "/v1/instrument_mode_string")
+        return body
+
+
     def get_projection_sub_mode(self):
         response, body = self._request("GET", "/v1/projection_sub_mode")
         return body
