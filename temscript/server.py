@@ -128,6 +128,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_beam_tilt()
         elif endpoint == "df_mode":
             response = self.server.microscope.get_df_mode()
+        elif endpoint == "df_mode_string":
+            response = self.server.microscope.get_df_mode_string()
         elif endpoint == "projection_sub_mode":
             response = self.server.microscope.get_projection_sub_mode()
         elif endpoint == "projection_mode":

@@ -460,6 +460,13 @@ class Microscope(object):
         """
         return self._tem_illumination.DFMode
 
+    def get_df_mode_string(self):
+        """
+        Return dark field mode as a string.
+        See class DarkFieldMode: possible values are "OFF", "CARTESIAN", "CONICAL"
+        """
+        return DarkFieldMode(self._tem_illumination.DFMode).name
+
     def set_df_mode(self, df_mode):
         """
         Set dark field mode.

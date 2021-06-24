@@ -192,6 +192,9 @@ class NullMicroscope(object):
     def get_df_mode(self):
         return self._df_mode
 
+    def get_df_mode_string(self):
+        return DarkFieldMode(self._df_mode).name
+
     def set_df_mode(self, df_mode):
         self._df_mode = df_mode
 

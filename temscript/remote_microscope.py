@@ -176,6 +176,10 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/df_mode")
         return body
 
+    def get_df_mode_string(self):
+        response, body = self._request("GET", "/v1/df_mode_string")
+        return body
+
     def set_df_mode(self, df_mode):
         content = json.dumps(df_mode).encode("utf-8")
         self._request("PUT", "/v1/df_mode", body=content, accepted_response=[200, 204],
