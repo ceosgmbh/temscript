@@ -235,6 +235,9 @@ class NullMicroscope(object):
     def get_illumination_mode(self):
         return self._illumination_mode
 
+    def get_illumination_mode_string(self):
+        return IlluminationMode(self._illumination_mode).name
+
     def get_condenser_mode(self):
         return self._condenser_mode
 

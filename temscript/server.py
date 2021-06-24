@@ -140,6 +140,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_projection_mode_type_string()
         elif endpoint == "illumination_mode":
             response = self.server.microscope.get_illumination_mode()
+        elif endpoint == "illumination_mode_string":
+            response = self.server.microscope.get_illumination_mode_string()
         elif endpoint == "illuminated_area":
             response = self.server.microscope.get_illuminated_area()
         elif endpoint == "condenser_mode":

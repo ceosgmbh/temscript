@@ -485,6 +485,13 @@ class Microscope(object):
         """
         return self._tem_illumination.Mode
 
+    def get_illumination_mode_string(self):
+        """
+        Return illumination mode as a string.
+        See class IlluminationMode: possible values are "NANOPROBE" and "MICROPROBE"
+        """
+        return IlluminationMode(self._tem_illumination.IlluminationMode).name
+
     def get_illuminated_area(self):
         """
         :return Return the size of the illuminated area (in meters).

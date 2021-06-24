@@ -259,6 +259,10 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/illumination_mode")
         return body
 
+    def get_illumination_mode_string(self):
+        response, body = self._request("GET", "/v1/illumination_mode_string")
+        return body
+
     def get_illuminated_area(self):
         response, body = self._request("GET", "/v1/illuminated_area")
         return body
