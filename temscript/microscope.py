@@ -507,6 +507,13 @@ class Microscope(object):
         """
         return self._tem_illumination.CondenserMode
 
+    def get_condenser_mode_string(self):
+        """
+        Return condenser mode as a string.
+        See class CondenserMode: possible values are "PARALLEL", "PROBE"
+        """
+        return CondenserMode(self._tem_illumination.CondenserMode).name
+
     def get_spot_size_index(self):
         """
         Return the spot size index as an integer.

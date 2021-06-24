@@ -238,6 +238,9 @@ class NullMicroscope(object):
     def get_condenser_mode(self):
         return self._condenser_mode
 
+    def get_condenser_mode_string(self):
+        return CondenserMode(self._condenser_mode).name
+
     def get_spot_size_index(self):
         return self._spot_size_index
 

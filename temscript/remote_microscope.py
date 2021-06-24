@@ -272,6 +272,10 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/condenser_mode")
         return body
 
+    def get_condenser_mode_string(self):
+        response, body = self._request("GET", "/v1/condenser_mode_string")
+        return body
+
     def get_magnification_index(self):
         response, body = self._request("GET", "/v1/magnification_index")
         return body

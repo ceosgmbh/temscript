@@ -144,6 +144,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_illuminated_area()
         elif endpoint == "condenser_mode":
             response = self.server.microscope.get_condenser_mode()
+        elif endpoint == "condenser_mode_string":
+            response = self.server.microscope.get_condenser_mode_string()
         elif endpoint == "spot_size_index":
             response = self.server.microscope.get_spot_size_index()
         elif endpoint == "magnification_index":
