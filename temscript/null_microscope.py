@@ -224,7 +224,10 @@ class NullMicroscope(object):
         self._projection_mode = mode
 
     def get_projection_mode_string(self):
-        return "SA"
+        return ProjectionSubMode(self._projection_sub_mode).name
+
+    def get_projection_mode_type_string(self):
+        return ProjectionMode(self._projection_mode).name
 
     def get_illumination_mode(self):
         return self._illumination_mode

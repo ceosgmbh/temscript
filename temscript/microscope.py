@@ -585,6 +585,14 @@ class Microscope(object):
         """
         return ProjectionSubMode(self._tem_projection.SubMode).name
 
+    def get_projection_mode_type_string(self):
+        """
+        Description of current projection mode type. Possible return values are: "IMAGING" and "DIFFRACTION"
+
+        .. versionadded:: 1.0.15
+        """
+        return ProjectionMode(self._tem_projection.Mode).name
+
     def get_magnification_index(self):
         """
         Return index of current magnification/camera length.
