@@ -92,6 +92,9 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             encoded_response = _gzipencode(encoded_response)
             self.send_header('Content-Encoding', 'gzip')
         self.send_header('Content-Type', content_type)
+        # add content length of the body to avoid accidental "partial download error" with twisted.web.client which
+        # assumes the body to be chunk-encoded
+        self.send_header('Content-Length', str(len(encoded_response)))
         self.end_headers()
         self.wfile.write(encoded_response)
         return
