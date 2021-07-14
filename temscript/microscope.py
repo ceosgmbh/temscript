@@ -503,7 +503,7 @@ class Microscope(object):
         Return illumination mode as a string.
         See class IlluminationMode: possible values are "NANOPROBE" and "MICROPROBE"
         """
-        return IlluminationMode(self._tem_illumination.IlluminationMode).name
+        return IlluminationMode(self._tem_illumination.Mode).name
 
     def get_illuminated_area(self):
         """
