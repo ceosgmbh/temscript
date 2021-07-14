@@ -454,14 +454,14 @@ class Microscope(object):
         """
         Return the instrument mode as an integer.
         """
-        return self._tem_instrument.InstrumentMode
+        return self._tem_instrument.InstrumentModeControl.InstrumentMode
 
     def get_instrument_mode_string(self):
         """
         Return illumination mode as a string.
         See class IlluminationMode: possible values are "TEM" and "STEM"
         """
-        return InstrumentMode(self._tem_instrument.InstrumentMode).name
+        return InstrumentMode(self._tem_instrument.InstrumentModeControl.InstrumentMode).name
 
     def get_df_mode(self):
         """
