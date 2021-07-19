@@ -73,7 +73,7 @@ class RemoteMicroscope(object):
         # Decode response
         content_type = response.getheader("Content-Type")
         if content_type not in self.accepted_content:
-            raise ValueError("Unexpected response type: %s", content_type)
+            raise ValueError("Unexpected response type: {}".format(content_type))
         if response.getheader("Content-Encoding") == "gzip":
             import zlib
             body = zlib.decompress(body, 16 + zlib.MAX_WBITS)
