@@ -77,13 +77,19 @@ class MicroscopeServerWithEvents:
         self.clients = set()
         self.clients_lock = asyncio.Lock()
 
-    async def http_handler(self, request):
+    async def http_get_handler_v1(self, request):
         ws = web.WebSocketResponse()
         for ws in self.clients:
-            await ws.send_str("WEBSOCKETEVENT from {}".format(request.match_info['name']))
-        return web.Response(text="HTTP for {}".format(request.match_info['name']))
+            await ws.send_str("WEBSOCKETEVENT-GET from {}".format(request.match_info['name']))
+        return web.Response(text="HTTP -GET for {}".format(request.match_info['name']))
 
-    async def websocket_handler(self, request):
+    async def http_put_handler_v1(self, request):
+        ws = web.WebSocketResponse()
+        for ws in self.clients:
+            await ws.send_str("WEBSOCKETEVENT-PUT from {}".format(request.match_info['name']))
+        return web.Response(text="HTTP-PUT for {}".format(request.match_info['name']))
+
+    async def websocket_handler_v1(self, request):
         print("Websocket handler called")
         ws = web.WebSocketResponse()
         # add client to set
@@ -122,11 +128,15 @@ class MicroscopeServerWithEvents:
 
     def run_server(self):
         app = web.Application()
-        # app.add_routes([web.get('/ws', websocket_handler), web.get('/v1', hello)]) # ws://127.0.0.1:8080/ws
-        app.add_routes([web.get('/ws', self.websocket_handler),  # ws://127.0.0.1:8080/ws/
-                        web.get(r'/v1/{name:.+}', self.http_handler)])  # http://127.0.0.1:8080/v1/*
+        # add routes for
+        # - HTTP-GET/PUT, e.g. http://127.0.0.1:8080/v1/projection_mode
+        # - websocket connection ws://127.0.0.1:8080/ws/v1
+        app.add_routes([web.get('/ws/v1', self.websocket_handler_v1),  #
+                        web.get(r'/v1/{name:.+}', self.http_get_handler_v1),
+                        web.put(r'/v1/{name:.+}', self.http_put_handler_v1),
+                        ])
 
-        web.run_app(app)  # port=8888
+        web.run_app(app, host="0.0.0.0", port=8080)
 
 if __name__ == '__main__':
     server = MicroscopeServerWithEvents()
