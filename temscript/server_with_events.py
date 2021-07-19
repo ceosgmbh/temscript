@@ -70,9 +70,16 @@ class MicroscopeServerWithEvents:
         http://127.0.0.1:8080/v1/...
     Websocket connections are initialized via the websocket URL
         ws://127.0.0.1:8080/ws/
+    :param host IP the webserver is running under. Default is "0.0.0.0" (run on all interfaces)
+    :type host str
+    :param port Port the webserver is running under. Default is "8080" (default HTTP-port)
+    :type port int
     """
 
-    def __init__(self):
+    def __init__(self, host="0.0.0.0", port=8080):
+        self.host = host
+        self.port = port
+        print("Configuring web server for host=%s, port=%s" % (self.host, self.port))
         # set of client references
         self.clients = set()
         self.clients_lock = asyncio.Lock()
@@ -127,6 +134,7 @@ class MicroscopeServerWithEvents:
             print("number of clients after removing client: %s " % len(self.clients))
 
     def run_server(self):
+        print("Starting web server with events under host=%s, port=%s" % (self.host, self.port))
         app = web.Application()
         # add routes for
         # - HTTP-GET/PUT, e.g. http://127.0.0.1:8080/v1/projection_mode
@@ -136,8 +144,10 @@ class MicroscopeServerWithEvents:
                         web.put(r'/v1/{name:.+}', self.http_put_handler_v1),
                         ])
 
-        web.run_app(app, host="0.0.0.0", port=8080)
+        web.run_app(app, host=self.host, port=self.port)
 
 if __name__ == '__main__':
-    server = MicroscopeServerWithEvents()
+    host="0.0.0.0"
+    port=8080
+    server = MicroscopeServerWithEvents(host=host, port=port)
     server.run_server()
