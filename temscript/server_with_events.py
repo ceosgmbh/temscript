@@ -8,6 +8,7 @@ import json
 import asyncio
 from aiohttp import web, WSMsgType
 
+
 class MicroscopeServerWithEvents:
     """
     Implements the same HTTP server as server.py
@@ -40,13 +41,13 @@ class MicroscopeServerWithEvents:
         self.clients_lock = asyncio.Lock()
 
     async def http_get_handler_v1(self, request):
-        # ws = web.WebSocketResponse()
-        # for ws in self.clients:
-        #     await ws.send_str("WEBSOCKETEVENT-GET from {}".format(request.match_info['name']))
-        # get query string (only used for http://<host>:>port/v1/acquire?detectors=<detectors>)
+        """
+        aiohttp handler fur GET request for V1
+        :param request: the aiohttp GET request
+        :return:  the aiohttp response
+        """
         command = request.match_info['name']
         parameter = request.rel_url.query
-        response=''
         try:
             response = self.do_GET_V1(command, parameter)
             if response is None:
@@ -67,8 +68,13 @@ class MicroscopeServerWithEvents:
             # any exception beyond that: send error status 500
             return web.Response(body=e, status=500)
 
-    # Handler for V1 GETs
     def do_GET_V1(self, command, parameter):
+        """
+        Handler for HTTP V1 GET requests
+        :param command: The GET command to execute
+        :param parameter: optional query parameter ,
+                          see "acquire" command
+        """
         # Check for known endpoints
         response = None
         if command == "family":
@@ -156,99 +162,119 @@ class MicroscopeServerWithEvents:
                 name = command[15:]
                 response = self.microscope.get_detector_param(name)
             except KeyError:
-                raise MicroscopeException('Unknown detector: %s' % self.path)
-                #self.send_error(404, 'Unknown detector: %s' % self.path)
-                #return
+                raise MicroscopeException('Unknown detector: %s' % command)
         elif command == "acquire":
             try:
                 detectors = parameter["detectors"]
             except KeyError:
-                # self.send_error(404, 'No detectors: %s' % self.path)
-                # return
-                raise MicroscopeException('No detectors: %s' % self.path)
+                raise MicroscopeException('No detectors: %s' % command)
             response = self.microscope.acquire(*detectors)
         else:
-            # self.send_error(404, 'Unknown endpoint: %s' % self.path)
-            # return
-            raise MicroscopeException('Unknown endpoint: %s' % self.path)
+            raise MicroscopeException('Unknown endpoint: %s' % command)
         return response
 
     async def http_put_handler_v1(self, request):
-        # ws = web.WebSocketResponse()
-        # for ws in self.clients:
-        #     await ws.send_str("WEBSOCKETEVENT-PUT from {}".format(request.match_info['name']))
-        return web.Response(text="HTTP-PUT for {}".format(request.match_info['name']))
+        """
+        aiohttp handler fur PUT request for V1
+        :param request: the aiohttp PUT request
+        :return:  the aiohttp response
+        """
+        command = request.match_info['name']
+        content_length = request.headers['content-length']
+        if content_length is not None:
+            if int(content_length) > 4096:
+                raise ValueError("Too much content...")
+        try:
+            # get JSON content
+            text_content = await request.text()
+            json_content = json.loads(text_content)
+            response = self.do_PUT_V1(command, json_content)
+            if response is None:
+                # unsupported command: send status 204
+                return web.Response(body="Unsupported command {}"
+                                    .format(command),
+                                    status=204)
+            else:
+                # send JSON response and (default) status 200
+                encoded_response = ArrayJSONEncoder()\
+                    .encode(response).encode("utf-8")
+                return web.Response(body=encoded_response,
+                                    content_type="application/json")
+        except MicroscopeException as e:
+            # regular exception due to misconfigurations etc.: send error status 404
+            return web.Response(body=e, status=404)
+        except Exception as e:
+            # any exception beyond that: send error status 500
+            return web.Response(body=e, status=500)
 
-    # # Handler for V1 PUTs
-    # def do_PUT_V1(self, endpoint, query):
-    #     # Read content
-    #     length = int(self.headers['Content-Length'])
-    #     if length > 4096:
-    #         raise ValueError("Too much content...")
-    #     content = self.rfile.read(length)
-    #     decoded_content = json.loads(content.decode("utf-8"))
-    #
-    #     # Check for known endpoints
-    #     response = None
-    #     if endpoint == "stage_position":
-    #         method = decoded_content.get("method", "GO")
-    #         pos = dict((k, decoded_content[k]) for k in decoded_content.keys() if k in STAGE_AXES)
-    #         try:
-    #             pos['speed'] = decoded_content['speed']
-    #         except KeyError:
-    #             pass
-    #         self.microscope.set_stage_position(pos, method=method)
-    #     elif endpoint == "image_shift":
-    #         self.microscope.set_image_shift(decoded_content)
-    #     elif endpoint == "beam_shift":
-    #         self.microscope.set_beam_shift(decoded_content)
-    #     elif endpoint == "beam_tilt":
-    #         self.microscope.set_beam_tilt(decoded_content)
-    #     elif endpoint == "df_mode":
-    #         self.microscope.set_df_mode(decoded_content)
-    #     elif endpoint == "illuminated_area":
-    #         self.microscope.set_illuminated_area(decoded_content)
-    #     elif endpoint == "projection_mode":
-    #         self.microscope.set_projection_mode(decoded_content)
-    #     elif endpoint == "magnification_index":
-    #         self.microscope.set_magnification_index(decoded_content)
-    #     elif endpoint == "stem_magnification":
-    #         self.microscope.set_stem_magnification(decoded_content)
-    #     elif endpoint == "defocus":
-    #         self.microscope.set_defocus(decoded_content)
-    #     elif endpoint == "probe_defocus":
-    #         self.microscope.set_probe_defocus(decoded_content)
-    #     elif endpoint == "intensity":
-    #         self.microscope.set_intensity(decoded_content)
-    #     elif endpoint == "diffraction_shift":
-    #         self.microscope.set_diffraction_shift(decoded_content)
-    #     elif endpoint == "objective_stigmator":
-    #         self.microscope.set_objective_stigmator(decoded_content)
-    #     elif endpoint == "condenser_stigmator":
-    #         self.microscope.set_condenser_stigmator(decoded_content)
-    #     elif endpoint == "beam_blanked":
-    #         self.microscope.set_beam_blanked(decoded_content)
-    #     elif endpoint.startswith("detector_param/"):
-    #         try:
-    #             name = endpoint[15:]
-    #             response = self.microscope.set_detector_param(name, decoded_content)
-    #         except KeyError:
-    #             self.send_error(404, 'Unknown detector: %s' % self.path)
-    #             return
-    #     elif endpoint == "normalize":
-    #         mode = decoded_content
-    #         try:
-    #             self.microscope.normalize(mode)
-    #         except ValueError:
-    #             self.send_error(404, 'Unknown mode.' % mode)
-    #             return
-    #     else:
-    #         self.send_error(404, 'Unknown endpoint: %s' % self.path)
-    #         return
-    #     self.build_response(response)
-
+    def do_PUT_V1(self, command, json_content):
+        """
+        Handler for HTTP V1 PUT requests
+        :param command: The PUT command to execute
+        :param json_content: the content/value to set
+        """
+        response = None
+        # Check for known endpoints
+        if command == "stage_position":
+            method = json_content.get("method", "GO")
+            pos = dict((k, json_content[k]) for k in json_content.keys() if k in self.microscope.STAGE_AXES)
+            try:
+                pos['speed'] = json_content['speed']
+            except KeyError:
+                pass
+            self.microscope.set_stage_position(pos, method=method)
+        elif command == "image_shift":
+            self.microscope.set_image_shift(json_content)
+        elif command == "beam_shift":
+            self.microscope.set_beam_shift(json_content)
+        elif command == "beam_tilt":
+            self.microscope.set_beam_tilt(json_content)
+        elif command == "df_mode":
+            self.microscope.set_df_mode(json_content)
+        elif command == "illuminated_area":
+            self.microscope.set_illuminated_area(json_content)
+        elif command == "projection_mode":
+            self.microscope.set_projection_mode(json_content)
+        elif command == "magnification_index":
+            self.microscope.set_magnification_index(json_content)
+        elif command == "stem_magnification":
+            self.microscope.set_stem_magnification(json_content)
+        elif command == "defocus":
+            self.microscope.set_defocus(json_content)
+        elif command == "probe_defocus":
+            self.microscope.set_probe_defocus(json_content)
+        elif command == "intensity":
+            self.microscope.set_intensity(json_content)
+        elif command == "diffraction_shift":
+            self.microscope.set_diffraction_shift(json_content)
+        elif command == "objective_stigmator":
+            self.microscope.set_objective_stigmator(json_content)
+        elif command == "condenser_stigmator":
+            self.microscope.set_condenser_stigmator(json_content)
+        elif command == "beam_blanked":
+            self.microscope.set_beam_blanked(json_content)
+        elif command.startswith("detector_param/"):
+            try:
+                name = command[15:]
+                response = self.microscope.set_detector_param(name, json_content)
+            except KeyError:
+                raise MicroscopeException('Unknown detector: %s' % command)
+        elif command == "normalize":
+            mode = json_content
+            try:
+                self.microscope.normalize(mode)
+            except ValueError:
+                raise MicroscopeException('Unknown mode: %s' % mode)
+        else:
+            raise MicroscopeException('Unknown endpoint: %s' % command)
+        return response
 
     async def websocket_handler_v1(self, request):
+        """
+        The aiohttp handler for websocket requests
+        :param request: The connection request
+        :return: the websocket response
+        """
         print("Websocket handler called")
         ws = web.WebSocketResponse()
         # add client to set
@@ -299,11 +325,17 @@ class MicroscopeServerWithEvents:
         web.run_app(app, host=self.host, port=self.port)
 
 class MicroscopeException(Exception):
+    """
+    Special exception class for returning HTTP status 204
+    """
     def __init__(self, *args, **kw):
         super(MicroscopeException, self).__init__(*args, **kw)
 
-# Numpy array encoding JSON encoder
+
 class ArrayJSONEncoder(json.JSONEncoder):
+    """
+    Numpy array encoding JSON encoder
+    """
     allowed_dtypes = {"INT8", "INT16", "INT32", "INT64", "UINT8", "UINT16", "UINT32", "UINT64", "FLOAT32", "FLOAT64"}
 
     def default(self, obj):
