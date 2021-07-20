@@ -1,10 +1,14 @@
 #!/usr/bin/python
 from __future__ import division, print_function
+
+# require python 3.5 for aiohttp
+import sys
+if sys.hexversion < 0x03050000:
+    sys.exit("Python 3.5 or newer is required to run this program.")
+
 import numpy as np
 import json
 
-# Get imports from library
-# Python 3.X
 import asyncio
 from aiohttp import web, WSMsgType
 
