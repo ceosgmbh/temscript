@@ -8,9 +8,10 @@ if sys.hexversion < 0x03050000:
 
 import numpy as np
 import json
-
+from io import BytesIO
 import asyncio
 from aiohttp import web, WSMsgType
+from contextlib import suppress
 
 
 class MicroscopeServerWithEvents:
@@ -335,7 +336,6 @@ class MicroscopeException(Exception):
     def __init__(self, *args, **kw):
         super(MicroscopeException, self).__init__(*args, **kw)
 
-
 class ArrayJSONEncoder(json.JSONEncoder):
     """
     Numpy array encoding JSON encoder
@@ -386,11 +386,91 @@ def _parse_enum(type, item):
         return type(item)
 
 
+class MicroscopeEventPublisher:
+    """
+    Periodically polls the microscope for a
+    number of changes and publishes changes
+    to all connected websocket clients.
+    :param microscope_server: The server instance
+    :param sleep_time: The sleeping time between
+            polling calls.
+    :param polling_config: A configuration dict of
+            methods and return types to poll.
+            value is a tuple consisting of a conversion method
+            (e.g. "float()") and a scaling factor
+            (for int/float-types)
+    """
+    def __init__(self, microscope_server,
+                 sleep_time, polling_config):
+        self.func = self.check_for_microscope_changes
+        self.microscope_server = microscope_server
+        self.sleep_time = sleep_time
+        self.polling_config = polling_config
+        self.is_started = False
+        self._task = None
+
+    def start(self):
+        if not self.is_started:
+            self.is_started = True
+            # Start task to call func periodically:
+            print("Start task to call func periodically")
+            self._task = asyncio.ensure_future(self._run())
+
+    def stop(self):
+        if self.is_started:
+            self.is_started = False
+            # Stop task and await it stopped:
+            print("Stop task and wait until is has stopped")
+            self._task.cancel()
+
+    async def _run(self):
+        while True:
+            # sleep as configured for the instance
+            await asyncio.sleep(self.sleep_time)
+            # call function and pass microscope_server as argument
+            await self.func(self.microscope_server)
+
+    async def check_for_microscope_changes(self, microscope_server):
+        print("checking for microscope changes...")
+
 if __name__ == '__main__':
     host="0.0.0.0"
     port=8080
+    # define all TEMScripting methods which should be polled
+    # during one polling event via the web server.
+    # value is a tuple consisting of a conversion method
+    # (e.g. "float()") and a scaling factor (for int/float)
+    # for the result of the method
+    tem_scripting_method_config = {
+        # for meta data key 'condenser.mode'
+        "instrument_mode_string": (str, 1),     # "TEM"/"STEM"
+        "illumination_mode":      (int, 1),    # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
+        "df_mode_string": (str, 1),             # e.g., "CARTESIAN", "OFF"
+        "spot_size_index": (int, 1),            # e.g., 3
+        "condenser_mode_string": (str, 1),      # e.g., "PROBE"
+        "beam_blanked": (bool, 1),              # True, False
+        # for meta data key 'electron_gun.voltage'
+        "voltage": (float, 1),                  # e.g., "200"
+        # for meta data key "objective.mode -> projector.camera_length"
+        "indicated_camera_length": (int, 1),    # e.g., "0", in meters (?)
+        # for meta data key "objective.mode -> projector.magnification"
+        "indicated_magnification": (float, 1),  # e.g., 200000.0
+        # for meta data key "objective.mode -> projector.mode"
+        "projection_mode_string": (str, 1),     # e.g., "SA"
+        "projection_mode_type_string": (str, 1),# e.g., "IMAGING"
+        # for meta data key "objective.mode -> scan_driver.magnification"
+        "stem_magnification": (float, 1),       # e.g., "6000"
+    }
+
     from .microscope import Microscope
     microscope = Microscope()
     server = MicroscopeServerWithEvents(microscope=microscope,
                                         host=host, port=port)
-    server.run_server()
+    microscope_event_publisher = MicroscopeEventPublisher(server, 1.0,
+                                        tem_scripting_method_config)
+    try:
+        microscope_event_publisher.start()
+        server.run_server()
+    finally:
+        microscope_event_publisher.stop()
+
