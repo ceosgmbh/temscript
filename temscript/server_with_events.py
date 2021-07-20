@@ -13,6 +13,7 @@ import asyncio
 from aiohttp import web, WSMsgType
 from contextlib import suppress
 
+import traceback
 
 class MicroscopeServerWithEvents:
     """
@@ -316,6 +317,35 @@ class MicroscopeServerWithEvents:
             self.clients.remove(ws)
             print("number of clients after removing client: %s " % len(self.clients))
 
+    def change_microscope_state(self, new_values):
+        """
+        Change a set of entries in the microscope state
+        and notify websocket clients in case of changes
+        :param changes: A dict with command-result values
+        :type changes: dict
+        :return:
+        """
+        changes = dict()
+        for command in new_values:
+            new_result = new_values[command]
+            if not command in self.microscope_state.keys():
+                # add new command/result to changes
+                changes[command] = new_result
+                # update value
+                self.microscope_state[command] = new_result
+            elif new_result != self.microscope_state[command]:
+                # results differ: add new result to changes
+                changes[command] = new_result
+                # update value
+                self.microscope_state[command] = new_result
+
+        print("changes=%s"  % changes)
+        # TODO send changes to websocket clients
+        # TODO send microscope state to newly connecting websocket clients
+
+    def reset_microscope_state(self):
+        self.microscope_state = dict()
+
     def run_server(self):
         print("Starting web server with events under host=%s, port=%s" % (self.host, self.port))
         app = web.Application()
@@ -402,36 +432,66 @@ class MicroscopeEventPublisher:
     """
     def __init__(self, microscope_server,
                  sleep_time, polling_config):
-        self.func = self.check_for_microscope_changes
         self.microscope_server = microscope_server
         self.sleep_time = sleep_time
         self.polling_config = polling_config
+
+        # the microscope state representation
+        self.microscope_state = dict()
+        # the method used for polling periodically
+        self.polling_func = self.check_for_microscope_changes
         self.is_started = False
         self._task = None
 
     def start(self):
+        # reset microscope state
+        self.microscope_server.reset_microscope_state()
         if not self.is_started:
             self.is_started = True
             # Start task to call func periodically:
-            print("Start task to call func periodically")
             self._task = asyncio.ensure_future(self._run())
 
     def stop(self):
+        # reset microscope state
+        self.microscope_server.reset_microscope_state()
         if self.is_started:
             self.is_started = False
             # Stop task and await it stopped:
-            print("Stop task and wait until is has stopped")
             self._task.cancel()
 
     async def _run(self):
         while True:
             # sleep as configured for the instance
             await asyncio.sleep(self.sleep_time)
-            # call function and pass microscope_server as argument
-            await self.func(self.microscope_server)
+            # call polling function
+            await self.polling_func()
 
-    async def check_for_microscope_changes(self, microscope_server):
+    async def check_for_microscope_changes(self):
         print("checking for microscope changes...")
+        try:
+            changed = {}
+            all_results = dict()
+            for get_command in self.polling_config:
+                try:
+                    # execute get command
+                    # (here: imply parameterless command)
+                    result_raw = self.microscope_server.do_GET_V1(get_command,
+                                                              None)
+                    print("found %s=%s..." %
+                          (get_command, result_raw))
+                    casting_func = self.polling_config[get_command][0]
+                    result = casting_func(result_raw)
+                    print("Adding %s=%s to results..." %
+                           (get_command, result))
+                    all_results[get_command] = result
+                except Exception as exc:
+                    print("TEMScripting method '{}' failed "
+                        "while polling: %s" % (get_command, exc))
+            self.microscope_server.change_microscope_state(all_results)
+
+        except Exception as exc:
+            traceback.print_exc()
+            print("Polling failed: %s" % exc)
 
 if __name__ == '__main__':
     host="0.0.0.0"
