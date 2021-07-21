@@ -42,6 +42,9 @@ class MicroscopeServerWithEvents:
         self.port = port
         self.microscope = microscope
         print("Configuring web server for host=%s, port=%s" % (self.host, self.port))
+
+        # a dict for storing polling results
+        self.microscope_state = dict()
         # set of client references
         self.clients = set()
         self.clients_lock = asyncio.Lock()
@@ -307,17 +310,34 @@ class MicroscopeServerWithEvents:
 
     async def add_websocket_client(self, ws):
         async with self.clients_lock:
-            print("number of clients before adding new client: %s " % len(self.clients))
+            print("number of clients before adding new client: %s " %
+                  len(self.clients))
             self.clients.add(ws)
-            print("number of clients after adding new client: %s " % len(self.clients))
+            print("number of clients after adding new client: %s " %
+                  len(self.clients))
 
     async def remove_websocket_client(self, ws):
         async with self.clients_lock:
-            print("number of clients before removing client: %s " % len(self.clients))
+            print("number of clients before removing client: %s " %
+                  len(self.clients))
             self.clients.remove(ws)
-            print("number of clients after removing client: %s " % len(self.clients))
+            print("number of clients after removing client: %s " %
+                  len(self.clients))
 
-    def change_microscope_state(self, new_values):
+    async def broadcast_to_websocket_clients(self, obj):
+        """
+        Converts obj to JSON string and sends the string to all connected websocket clients.
+        :param obj: JSON-serializable object
+        :return:
+        """
+        # encoded_obj = ArrayJSONEncoder() \
+        #     .encode(obj).encode("utf-8")
+        async with self.clients_lock:
+            for ws in self.clients:
+                await ws.send_json(obj)
+                # await ws.send_str(encoded_obj)
+
+    async def change_microscope_state(self, new_values):
         """
         Change a set of entries in the microscope state
         and notify websocket clients in case of changes
@@ -340,6 +360,9 @@ class MicroscopeServerWithEvents:
                 self.microscope_state[command] = new_result
 
         print("changes=%s"  % changes)
+        if changes:
+            await self.broadcast_to_websocket_clients(changes)
+
         # TODO send changes to websocket clients
         # TODO send microscope state to newly connecting websocket clients
 
@@ -487,7 +510,7 @@ class MicroscopeEventPublisher:
                 except Exception as exc:
                     print("TEMScripting method '{}' failed "
                         "while polling: %s" % (get_command, exc))
-            self.microscope_server.change_microscope_state(all_results)
+            await self.microscope_server.change_microscope_state(all_results)
 
         except Exception as exc:
             traceback.print_exc()
