@@ -45,9 +45,11 @@ class MicroscopeServerWithEvents:
 
         # a dict for storing polling results
         self.microscope_state = dict()
+        self.microscope_state_lock = asyncio.Lock()
         # set of client references
         self.clients = set()
         self.clients_lock = asyncio.Lock()
+
 
     async def http_get_handler_v1(self, request):
         """
@@ -287,8 +289,8 @@ class MicroscopeServerWithEvents:
         print("Websocket handler called")
         ws = web.WebSocketResponse()
         # add client to set
-        await self.add_websocket_client(ws)
         await ws.prepare(request)
+        await self.add_websocket_client(ws)
 
         async for msg in ws:
             if msg.type == WSMsgType.TEXT:
@@ -315,6 +317,9 @@ class MicroscopeServerWithEvents:
             self.clients.add(ws)
             print("number of clients after adding new client: %s " %
                   len(self.clients))
+        async with self.microscope_state_lock:
+            if self.microscope_state:
+                await ws.send_json(self.microscope_state)
 
     async def remove_websocket_client(self, ws):
         async with self.clients_lock:
@@ -330,12 +335,10 @@ class MicroscopeServerWithEvents:
         :param obj: JSON-serializable object
         :return:
         """
-        # encoded_obj = ArrayJSONEncoder() \
-        #     .encode(obj).encode("utf-8")
         async with self.clients_lock:
             for ws in self.clients:
+                # send object as JSON to websocket client
                 await ws.send_json(obj)
-                # await ws.send_str(encoded_obj)
 
     async def change_microscope_state(self, new_values):
         """
@@ -346,18 +349,19 @@ class MicroscopeServerWithEvents:
         :return:
         """
         changes = dict()
-        for command in new_values:
-            new_result = new_values[command]
-            if not command in self.microscope_state.keys():
-                # add new command/result to changes
-                changes[command] = new_result
-                # update value
-                self.microscope_state[command] = new_result
-            elif new_result != self.microscope_state[command]:
-                # results differ: add new result to changes
-                changes[command] = new_result
-                # update value
-                self.microscope_state[command] = new_result
+        async with self.microscope_state_lock:
+            for command in new_values:
+                new_result = new_values[command]
+                if not command in self.microscope_state.keys():
+                    # add new command/result to changes
+                    changes[command] = new_result
+                    # update value
+                    self.microscope_state[command] = new_result
+                elif new_result != self.microscope_state[command]:
+                    # results differ: add new result to changes
+                    changes[command] = new_result
+                    # update value
+                    self.microscope_state[command] = new_result
 
         print("changes=%s"  % changes)
         if changes:
@@ -442,8 +446,8 @@ def _parse_enum(type, item):
 class MicroscopeEventPublisher:
     """
     Periodically polls the microscope for a
-    number of changes and publishes changes
-    to all connected websocket clients.
+    number of changes and forwards the result
+    to the microscope state.
     :param microscope_server: The server instance
     :param sleep_time: The sleeping time between
             polling calls.
