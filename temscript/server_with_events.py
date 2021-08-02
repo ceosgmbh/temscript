@@ -294,16 +294,17 @@ class MicroscopeServerWithEvents:
 
         async for msg in ws:
             if msg.type == WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await ws.close()
-                else:
-                    await ws.send_str(msg.data + '/answer')
+                if msg.data != 'close':
+                    print('websocket connection received unsupported text message: "%s"' % msg.data)
+                await ws.close()
             elif msg.type == WSMsgType.ERROR:
                 await self.remove_websocket_client(ws)
-                print('ws connection closed with exception %s' %
+                print('websocket connection closed with exception %s' %
                       ws.exception())
+                await ws.close()
             else:
-                print('Unsupported websocket message type %s' % msg.type)
+                print('Received unsupported websocket message type "%s": closing connection' % msg.type)
+                await ws.close()
 
         await self.remove_websocket_client(ws)
         print('websocket connection closed')
@@ -312,13 +313,14 @@ class MicroscopeServerWithEvents:
 
     async def add_websocket_client(self, ws):
         async with self.clients_lock:
-            print("number of clients before adding new client: %s " %
+            print('number of clients before adding new client: %s ' %
                   len(self.clients))
             self.clients.add(ws)
-            print("number of clients after adding new client: %s " %
+            print('number of clients after adding new client: %s ' %
                   len(self.clients))
         async with self.microscope_state_lock:
             if self.microscope_state:
+                print('Sending microscope state to new client.')
                 await ws.send_json(self.microscope_state)
 
     async def remove_websocket_client(self, ws):
@@ -362,13 +364,10 @@ class MicroscopeServerWithEvents:
                     changes[command] = new_result
                     # update value
                     self.microscope_state[command] = new_result
-
-        print("changes=%s"  % changes)
+        if len(changes) > 0:
+            print("changes=%s"  % changes)
         if changes:
             await self.broadcast_to_websocket_clients(changes)
-
-        # TODO send changes to websocket clients
-        # TODO send microscope state to newly connecting websocket clients
 
     def reset_microscope_state(self):
         self.microscope_state = dict()
@@ -494,7 +493,7 @@ class MicroscopeEventPublisher:
             await self.polling_func()
 
     async def check_for_microscope_changes(self):
-        print("checking for microscope changes...")
+        #print("checking for microscope changes...")
         try:
             changed = {}
             all_results = dict()
@@ -504,12 +503,12 @@ class MicroscopeEventPublisher:
                     # (here: imply parameterless command)
                     result_raw = self.microscope_server.do_GET_V1(get_command,
                                                               None)
-                    print("found %s=%s..." %
-                          (get_command, result_raw))
+                    #print("found %s=%s..." %
+                    #      (get_command, result_raw))
                     casting_func = self.polling_config[get_command][0]
                     result = casting_func(result_raw)
-                    print("Adding %s=%s to results..." %
-                           (get_command, result))
+                    #print("Adding %s=%s to results..." %
+                    #       (get_command, result))
                     all_results[get_command] = result
                 except Exception as exc:
                     print("TEMScripting method '{}' failed "
