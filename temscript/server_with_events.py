@@ -286,28 +286,41 @@ class MicroscopeServerWithEvents:
         :param request: The connection request
         :return: the websocket response
         """
-        print("Websocket handler called")
+        print('Websocket client session opened.')
+        # available options for WebSocketResponse client session:
+        #   autoping=True (default), heartbeat=5 (necessary for pings)
+        #   receive_timeout=10
         ws = web.WebSocketResponse()
-        # add client to set
+        remote_ip = request.remote
+        print('Websocket handler for IP %s created.' % remote_ip)
         await ws.prepare(request)
+        # add client to set
         await self.add_websocket_client(ws)
 
-        async for msg in ws:
-            if msg.type == WSMsgType.TEXT:
-                if msg.data != 'close':
-                    print('websocket connection received unsupported text message: "%s"' % msg.data)
-                await ws.close()
-            elif msg.type == WSMsgType.ERROR:
-                await self.remove_websocket_client(ws)
-                print('websocket connection closed with exception %s' %
-                      ws.exception())
-                await ws.close()
-            else:
-                print('Received unsupported websocket message type "%s": closing connection' % msg.type)
-                await ws.close()
-
-        await self.remove_websocket_client(ws)
-        print('websocket connection closed')
+        try:
+            async for msg in ws:
+                if msg.type == WSMsgType.TEXT:
+                    if msg.data != 'close':
+                        print('websocket connection received unsupported text message: "%s"' % msg.data)
+                    await ws.close()
+                elif msg.type == WSMsgType.PING:
+                    pass
+                    # print('websocket connection received PING')
+                elif msg.type == WSMsgType.PONG:
+                    pass
+                    # print('websocket connection received PONG')
+                elif msg.type == WSMsgType.ERROR:
+                    await self.remove_websocket_client(ws)
+                    print('websocket connection closed with exception %s' %
+                          ws.exception())
+                    await ws.close()
+                else:
+                    print('Received unsupported websocket message type "%s": closing connection' % msg.type)
+                    await ws.close()
+        finally:
+            print('Websocket client session closed for IP %s' % remote_ip)
+            await ws.close()
+            await self.remove_websocket_client(ws)
 
         return ws
 
