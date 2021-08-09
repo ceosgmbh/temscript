@@ -393,8 +393,9 @@
     }
 
 /**
- * Implement static function <cls>_get_<propname>, that queries <prop_iface> from COM object with function get_<propname>
- * and converts the value into the python type <prop_cls> and returns it.
+ * Implement static functionInstrument_get_Gun1, that queries Gunfrom COM object with function get_Gun.
+ * Afterwards the (inherited) Gun1 interface of Gun is queried and returned.
+ * Note: The Gun1 interface is only available from StdScript.dll version 7.10 onward.
  **/
 #define OBJECT_PROPERTY_GETTER_GUN1() \
     static PyObject* Instrument_get_Gun1(Instrument *self, void *) \
@@ -410,9 +411,12 @@
         } \
         std::cout << "*Gun=" << iface << "\n" << std::endl; \
         std::cout << "before query Gun1\n" << std::endl; \
-        /** TEMScripting::Gun1* iface2 = reinterpret_cast<TEMScripting::Gun1*>(iface); **/ \
         TEMScripting::Gun1* iface2; \
-        iface->QueryInterface(__uuidof(TEMScripting::Gun1), (void **)&iface2); \
+        HRESULT result2 = iface->QueryInterface(__uuidof(TEMScripting::Gun1), (void **)&iface2); \
+        if (FAILED(result2)) { \
+            raiseComError(result2); \
+            return NULL; \
+        } \
         std::cout << "after query Gun1\n" << std::endl; \
         std::cout << "iface2=" << iface2<< "\n" << std::endl; \
         std::cout << "before Gun1_create\n" << std::endl; \
