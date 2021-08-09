@@ -9,6 +9,18 @@ OBJECT_PROPERTY_GETTER(Instrument, Stage, Stage, TEMScripting::Stage)
 OBJECT_PROPERTY_GETTER(Instrument, Acquisition, Acquisition, TEMScripting::Acquisition)
 OBJECT_PROPERTY_GETTER(Instrument, Vacuum, Vacuum, TEMScripting::Vacuum)
 OBJECT_PROPERTY_GETTER(Instrument, Gun, Gun, TEMScripting::Gun)
+// custom getter for `Gun1` interface from StdScript.dll version 7.10 which inherits from the Gun interface
+OBJECT_PROPERTY_GETTER_GUN1()
+
+//OBJECT_PROPERTY_GETTER(Instrument, Gun1, Gun, TEMScripting::Gun1)
+/// OBJECT_PROPERTY_GETTER3(Instrument, Gun1, Gun, Gun, TEMScripting::Gun1)
+//OBJECT_PROPERTY_GETTER(Instrument, Gun1, Gun, TEMScripting::Gun1)
+//OBJECT_DERIVED_PROPERTY_GETTER(Instrument, Gun, Gun, TEMScripting::Gun, Gun1, Gun1, TEMScripting::Gun1)
+//OBJECT_DERIVED_PROPERTY_GETTER(Instrument, Gun, Gun, TEMScripting::Gun, Gun1, Gun1, TEMScripting::Gun1)
+// OBJECT_PROPERTY_GETTER(Instrument, Gun1, Gun1, TEMScripting::Gun1)
+//OBJECT_PROPERTY_GETTER2(Instrument, Gun1, Gun1, TEMScripting::Gun, TEMScripting::Gun1)
+// OBJECT_PROPERTY_GETTER2(Instrument, Gun, Gun, TEMScripting::Gun, TEMScripting::Gun1)
+
 OBJECT_PROPERTY_GETTER(Instrument, BlankerShutter, BlankerShutter, TEMScripting::BlankerShutter)
 OBJECT_PROPERTY_GETTER(Instrument, InstrumentModeControl, InstrumentModeControl, TEMScripting::InstrumentModeControl)
 BOOL_PROPERTY_GETTER(Instrument, AutoNormalizeEnabled)
@@ -33,6 +45,7 @@ static PyGetSetDef Instrument_getset[] = {
     {"AutoNormalizeEnabled", (getter)&Instrument_get_AutoNormalizeEnabled, (setter)&Instrument_set_AutoNormalizeEnabled, NULL, NULL},
     {"Vacuum",               (getter)&Instrument_get_Vacuum, NULL, NULL, NULL},
     {"Gun",                  (getter)&Instrument_get_Gun, NULL, NULL, NULL},
+    {"Gun1",                 (getter)&Instrument_get_Gun1, NULL, NULL, NULL},
     {"BlankerShutter",       (getter)&Instrument_get_BlankerShutter, NULL, NULL, NULL},
     {"InstrumentModeControl",(getter)&Instrument_get_InstrumentModeControl, NULL, NULL, NULL},
     {NULL}  /* Sentinel */

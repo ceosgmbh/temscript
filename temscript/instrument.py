@@ -54,6 +54,9 @@ except ImportError:
     class Gun:
         pass
 
+    class Gun1:
+        pass
+
     class BlankerShutter:
         pass
 

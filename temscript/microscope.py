@@ -39,6 +39,7 @@ class Microscope(object):
         tem = GetInstrument()
         self._tem_instrument = tem
         self._tem_gun = tem.Gun
+        self._tem_gun1 = tem.Gun1
         self._tem_illumination = tem.Illumination
         self._tem_projection = tem.Projection
         self._tem_stage = tem.Stage
@@ -82,6 +83,44 @@ class Microscope(object):
         else:
             return 0.0
 
+    def get_voltage_offset(self):
+        """
+        Return high voltage offset in Volts.
+        Note: Uses Gun1 interface from StScript.dll 7.10
+
+        .. versionadded:: 2.0.0
+
+        :return: Float with high voltage offset
+        """
+        state = self._tem_gun.HTState
+        if state == HighTensionState.ON:
+            return self._tem_gun1.HighVoltageOffset
+        else:
+            return 0.0
+
+    def set_voltage_offset(self, voltage_offset):
+        """
+        Set high voltage offset in Volts.
+        Note: Uses Gun1 interface from StScript.dll 7.10
+
+        .. versionadded:: 2.0.0
+
+        :param voltage_offset 
+        :type voltage_offset Float with high voltage offset in Volts
+        """
+        self._tem_gun1.HighVoltageOffset = voltage_offset 
+
+    def get_voltage_offset_range(self):
+        """
+        Return high voltage offset in Volts.
+        Note: Uses Gun1 interface from StScript.dll 7.10
+
+        .. versionadded:: 2.0.0
+
+        :return: Tuple with high voltage offset range (min, max).
+        """
+        return self._tem_gun1.GetHighVoltageOffsetRange
+ 
     def get_vacuum(self):
         """
         Return status of the vacuum system. The method will return a dict with the following entries:
