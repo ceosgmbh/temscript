@@ -119,7 +119,7 @@ class Microscope(object):
 
         :return: Tuple with high voltage offset range (min, max).
         """
-        return self._tem_gun1.GetHighVoltageOffsetRange
+        return self._tem_gun1.GetHighVoltageOffsetRange()
  
     def get_vacuum(self):
         """
