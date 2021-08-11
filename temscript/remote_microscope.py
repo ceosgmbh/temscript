@@ -102,6 +102,15 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/voltage")
         return body
 
+    def get_voltage_offset(self):
+        response, body = self._request("GET", "/v1/voltage_offset")
+        return body
+
+    def set_voltage_offset(self, voltage_offset_value):
+        content = json.dumps(voltage_offset_value).encode("utf-8")
+        self._request("PUT", "/v1/voltage_offset", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
     def get_stage_holder(self):
         response, body = self._request("GET", "/v1/stage_holder")
         return body

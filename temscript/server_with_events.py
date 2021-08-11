@@ -168,6 +168,11 @@ class MicroscopeServerWithEvents:
             response = self.microscope.get_optics_state()
         elif command == "beam_blanked":
             response = self.microscope.get_beam_blanked()
+        elif command == "voltage_offset":
+            print('Getting voltage_offset...')
+            # HT offset supported by StdScript 7.10
+            response = self.microscope.get_voltage_offset()
+            print('Returning voltage_offset=%s...' % response)
         elif command.startswith("detector_param/"):
             try:
                 name = command[15:]
@@ -182,6 +187,7 @@ class MicroscopeServerWithEvents:
             response = self.microscope.acquire(*detectors)
         else:
             raise MicroscopeException('Unknown endpoint: %s' % command)
+        print('Returning response %s for command %s...' % (response, command))
         return response
 
     async def http_put_handler_v1(self, request):
@@ -264,6 +270,9 @@ class MicroscopeServerWithEvents:
             self.microscope.set_condenser_stigmator(json_content)
         elif command == "beam_blanked":
             self.microscope.set_beam_blanked(json_content)
+        elif command == "voltage_offset":
+            # HT offset supported by StdScript 7.10
+            self.microscope.set_voltage_offset(json_content)
         elif command.startswith("detector_param/"):
             try:
                 name = command[15:]

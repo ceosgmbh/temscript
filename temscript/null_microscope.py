@@ -57,6 +57,7 @@ class NullMicroscope(object):
         self._probe_defocus = 0.0
         self._intensity = 0.0
         self._beam_blanked = False
+        self._voltage_offset = 0.0
 
     def get_family(self):
         return "NULL"
@@ -71,6 +72,20 @@ class NullMicroscope(object):
 
     def get_voltage(self):
         return self._voltage
+
+    def get_voltage_offset(self):
+        """
+        HT offset supported by StdScript 7.10
+        :return: HT offset in volts
+        """
+        return self._voltage_offset
+
+    def set_voltage_offset(self, voltage_offset_value):
+        """
+        HT offset supported by StdScript 7.10
+        :param voltage_offset_value HT offset in volts
+        """
+        self._voltage_offset = voltage_offset_value
 
     def get_vacuum(self):
         return {
