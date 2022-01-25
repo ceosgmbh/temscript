@@ -1,6 +1,8 @@
 from temscript import server_with_events
 from temscript.null_microscope import NullMicroscope
 from asyncio import get_event_loop
+import traceback
+import sys
 
 # to be started on the Titan microscope PC
 print("Starting DUMMY temscripting Microscope HTTP Server with Websocket Events...")
@@ -46,6 +48,7 @@ try:
         microscope_event_publisher.stop()
 except Exception as exc:
     print("Caught exception %s" % exc)
-    raise exc
+    print(traceback.format_exc())
+    wait = input("Press Enter to exit server.")
 
 print("Done.")  

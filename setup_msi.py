@@ -270,18 +270,11 @@ def main(product_name, description, upgrade_code, scripts, packages, includes,
         # set bdist_exe options
         if msi_only:
             external_packages = []
-            # avoid adding python27.dll again
-            binary_modules = set()
-            ###binary_modules = {}
-                ## { name for name in includes # if name.startswith('pyCor.')}
-            # avoid adding python27.dll again
-            # TODO: remove unnecessary packages
-            ###binary_modules.update({
-            # binary_modules = {
-            #     'cv2', 'scipy', 'numpy', 'PyQt5', 'PIL', 'PIL.ImageDraw',
-            #     'zope.interface', 'matplotlib',
-            #     'panta_rhei.extensions', 'pyfftw', 'pywt', 'tifffile'}
-            ###)
+            # remove unnecessary packages
+            binary_modules = {
+                'cv2', 'scipy', 'PyQt5', 'PIL', 'PIL.ImageDraw',
+                'zope.interface', 'matplotlib',
+                'pyfftw', 'pywt', 'tifffile'}
             exe_includes = list(set(includes) - binary_modules)
             excludes += list(binary_modules)
         else:
