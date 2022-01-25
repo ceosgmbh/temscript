@@ -44,5 +44,6 @@ try:
         microscope_event_publisher.stop()
 except Exception as exc:
     print("Caught exception %s" % exc)
+    raise exc
 
 print("Done.")
