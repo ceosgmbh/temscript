@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Setup script for MSI All-In-One_installer using cx_freeze.
+Setup script for MSI All-In-One_installer using cx_freeze (requires python 3.8).
 """
 import importlib
 import pkgutil
@@ -114,16 +114,16 @@ default_packages = ['temscript', '_temscript_module']
 # MSI definitions for Temscripting (Dummy) Server
 msi_definitions = {
     'TemScriptServer': {
-        'product_name': 'CEOS Temscripting Server for TFS',
-        'description': 'Temscripting Server for TFS.',
+        'product_name': 'CEOS Temscripting Server',
+        'description': 'Temscripting Server.',
         'upgrade_code': '{3F5EB5E6-6934-4465-88BE-F1CA715D4F8D}',
         'scripts': [
             {'script': 'scripts/start-remote-server-with-events.py',
-             'shortcut_name': 'Temscripting Server for TFS',
+             'shortcut_name': 'Temscripting Server',
              'base': None,  # show console
              'target_name': 'temscript_server.exe'},
             {'script': 'scripts/start-remote-dummy-server-with-events.py',
-             'shortcut_name': 'Temscripting Dummy Server for TFS',
+             'shortcut_name': 'Temscripting Dummy Server',
              'base': None,  # show console
              'target_name': 'temscript_dummy_server.exe'}],
         #'includes': [],
@@ -262,10 +262,6 @@ def main(product_name, description, upgrade_code, scripts, packages, includes,
         excludes += [exclude
                      for exclude in all_packages
                      if exclude not in packages]
-
-        # # Exclude all pyCor packages not explicitly added.
-        # excludes += blacklist_unwanted_modules('pyCor', set(includes))
-        # excludes.remove('pyCor')  # must not be excluded completely
 
         # set bdist_exe options
         if msi_only:
