@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Setup script for MSI All-In-One_installer using cx_freeze (requires python 3.8).
+Setup script for MSI All-In-One_installer using cx_freeze (requires python 3.8, 32bit) with packages
+  cx_freeze, numpy, aiohttp
+Note: Interaction with StdScript.dll will only work for 32-bit Python versions!
 """
 import importlib
 import pkgutil
