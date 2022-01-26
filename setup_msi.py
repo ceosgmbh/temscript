@@ -155,7 +155,12 @@ def main(product_name, description, upgrade_code, scripts, packages, includes,
     freeze = os.environ.get('TEMSCRIPT_SERVER_SETUP_FREEZE', False)
     msi_only = os.environ.get('TEMSCRIPT_SERVER_SETUP_MSI_ONLY', False)
 
-    ext_modules = []
+    # Note: requires StdScript.dll version >= 7.10 in "temscript\_temscript_module"
+    ext_modules = [
+        Extension(
+            '_temscript',
+            sources=glob('_temscript_module/*.cpp'),
+            include_dirs=numpy_include_dirs)]
 
     # license_folder = 'third-party-licenses'
     # license_files = [
