@@ -238,6 +238,7 @@ extern "C" void init_temscript(void)
     if (PyType_Ready(&Projection_Type) < 0) return INIT_ERROR;
     if (PyType_Ready(&Illumination_Type) < 0) return INIT_ERROR;
     if (PyType_Ready(&Gun_Type) < 0) return INIT_ERROR;
+    if (PyType_Ready(&Gun1_Type) < 0) return INIT_ERROR;
     if (PyType_Ready(&BlankerShutter_Type) < 0) return INIT_ERROR;
     if (PyType_Ready(&InstrumentModeControl_Type) < 0) return INIT_ERROR;
     if (PyType_Ready(&Instrument_Type) < 0) return INIT_ERROR;
@@ -272,6 +273,7 @@ extern "C" void init_temscript(void)
     Py_INCREF(&Projection_Type);
     Py_INCREF(&Illumination_Type);
     Py_INCREF(&Gun_Type);
+    Py_INCREF(&Gun1_Type);
     Py_INCREF(&BlankerShutter_Type);
     Py_INCREF(&InstrumentModeControl_Type);
     Py_INCREF(&Instrument_Type);
@@ -291,6 +293,7 @@ extern "C" void init_temscript(void)
     PyModule_AddObject(temscriptModule, "Projection", (PyObject *)&Projection_Type);
     PyModule_AddObject(temscriptModule, "Illumination", (PyObject *)&Illumination_Type);
     PyModule_AddObject(temscriptModule, "Gun", (PyObject *)&Gun_Type);
+    PyModule_AddObject(temscriptModule, "Gun1", (PyObject *)&Gun1_Type);
     PyModule_AddObject(temscriptModule, "BlankerShutter", (PyObject *)&BlankerShutter_Type);
     PyModule_AddObject(temscriptModule, "InstrumentModeControl", (PyObject *)&InstrumentModeControl_Type);
     PyModule_AddObject(temscriptModule, "Instrument", (PyObject *)&Instrument_Type);
