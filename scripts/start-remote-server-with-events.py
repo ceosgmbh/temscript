@@ -25,6 +25,8 @@ try:
         "beam_blanked": (bool, 1),  # True, False
         # for meta data key 'electron_gun.voltage'
         "voltage": (float, 1),  # e.g., "200"
+        # for backend key 'microscope.elementValues.HTOffset'
+        "voltage_offset": (float, 1),  # e.g., "0.1"
         # for meta data key "objective.mode -> projector.camera_length"
         "indicated_camera_length": (int, 1),  # e.g., "0", in meters (?)
         # for meta data key "objective.mode -> projector.magnification"

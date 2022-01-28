@@ -169,10 +169,8 @@ class MicroscopeServerWithEvents:
         elif command == "beam_blanked":
             response = self.microscope.get_beam_blanked()
         elif command == "voltage_offset":
-            print('Getting voltage_offset...')
             # HT offset supported by StdScript 7.10
             response = self.microscope.get_voltage_offset()
-            print('Returning voltage_offset=%s...' % response)
         elif command.startswith("detector_param/"):
             try:
                 name = command[15:]
@@ -187,7 +185,7 @@ class MicroscopeServerWithEvents:
             response = self.microscope.acquire(*detectors)
         else:
             raise MicroscopeException('Unknown endpoint: %s' % command)
-        print('Returning response %s for command %s...' % (response, command))
+        # print('Returning response %s for command %s...' % (response, command))
         return response
 
     async def http_put_handler_v1(self, request):
@@ -342,7 +340,8 @@ class MicroscopeServerWithEvents:
                   len(self.clients))
         async with self.microscope_state_lock:
             if self.microscope_state:
-                print('Sending microscope state to new client.')
+                print('Sending microscope state to new client: %s :' %
+                      self.microscope_state)
                 await ws.send_json(self.microscope_state)
 
     async def remove_websocket_client(self, ws):
@@ -529,8 +528,8 @@ class MicroscopeEventPublisher:
                     #      (get_command, result_raw))
                     casting_func = self.polling_config[get_command][0]
                     result = casting_func(result_raw)
-                    #print("Adding %s=%s to results..." %
-                    #       (get_command, result))
+                    # print("Adding %s=%s to results..." %
+                    #        (get_command, result))
                     all_results[get_command] = result
                 except Exception as exc:
                     print("TEMScripting method '{}' failed "
@@ -559,6 +558,8 @@ if __name__ == '__main__':
         "beam_blanked": (bool, 1),              # True, False
         # for meta data key 'electron_gun.voltage'
         "voltage": (float, 1),                  # e.g., "200"
+        # for backend key 'microscope.elementValues.HTOffset'
+        "voltage_offset": (float, 1),           # e.g., "0.1"
         # for meta data key "objective.mode -> projector.camera_length"
         "indicated_camera_length": (int, 1),    # e.g., "0", in meters (?)
         # for meta data key "objective.mode -> projector.magnification"
