@@ -8,7 +8,7 @@ pipeline {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: env.GIT_BRANCH]],
+                    branches: [[name: '*/$branch']],
                     browser: [
                         $class: 'Phabricator',
                         repo: 'TEMSCRIPTCEOS',
@@ -23,7 +23,7 @@ pipeline {
                     ]], 
                     userRemoteConfigs: [[
                         credentialsId: 'bobrd',
-                        url: 'ssh://ceosgit.nodomain/var/lib/git/pyCorr.git'
+                        url: 'https://github.com/christian-at-ceos/temscript/'
                     ]]
                 ])
             }
