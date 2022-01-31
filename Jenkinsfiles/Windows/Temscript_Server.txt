@@ -72,7 +72,7 @@ pipeline {
                     cd temscript
                     call setup_msi_build_installer_server.bat
                 '''
-                archiveArtifacts 'panta-rhei/dist/*'
+                archiveArtifacts 'temscript/dist/*'
             }
         }
         stage("Cleanup") {
