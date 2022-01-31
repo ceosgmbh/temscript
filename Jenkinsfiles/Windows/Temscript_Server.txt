@@ -1,0 +1,91 @@
+pipeline {
+    agent {label "win10-build"}
+    environment {
+        PYTHON_INSTALLATION = "C:\\Python38-32Bit"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: env.GIT_BRANCH]],
+                    browser: [
+                        $class: 'Phabricator',
+                        repo: 'TEMSCRIPTCEOS',
+                        repoUrl: 'https://phabricator.nodomain/diffusion/'
+                    ],
+                    extensions: [[
+                        $class: 'RelativeTargetDirectory',
+                        relativeTargetDir: 'temscript'
+                    ], [
+                        $class: 'CleanCheckout',
+                        deleteUntrackedNestedRepositories: true
+                    ], 
+                    userRemoteConfigs: [[
+                        credentialsId: 'bobrd',
+                        url: 'ssh://ceosgit.nodomain/var/lib/git/pyCorr.git'
+                    ]]
+                ])
+            }
+        }
+        stage("Setup pyenv") {
+            steps {
+                bat label: 'pyenv',
+                script: '''
+                    @echo off
+                    :: Switch console to unicode as a workaround for encoding
+                    :: errors while running setup.py.
+                    chcp 65001
+
+                    :: create and activate the virtual python environment and install external requirements
+                    set PATH=%PYTHON_INSTALLATION%;%PATH%
+
+                    if exist python_env rmdir python_env /s /q
+                    python -m venv python_env
+                    call python_env/Scripts/activate.bat
+
+                    :: make sure to use latest pip, setuptools and wheel
+                    python -m pip install -U pip
+                    python -m pip install -U setuptools wheel
+
+                    python -m pip install -U -r temscript\\Jenkinsfiles\\Windows\\_Build_environment_python38.txt
+
+                    python --version
+                    python -m pip freeze
+                '''
+            }
+        }
+        stage("Build Temscript") {
+            steps {
+                bat label: 'build',
+                script: '''
+                    @echo off
+                    :: Switch console to unicode as a workaround for encoding
+                    :: errors while running setup.py.
+                    chcp 65001
+                    :: copy build requirement (for extension) StdScript.dll 7.10 by Geert Ubink
+                    echo "Copying C:\\Titan\\Scripting\\StdScript.dll..."
+                    copy C:\\Titan\\Scripting\\StdScript.dll temscript\\_temscript_module
+                    :: Activate the prepared python venv
+                    call python_env/Scripts/activate.bat
+                    :: build temscript server MSI installer
+                    cd temscript
+                    call setup_msi_build_installer_server.bat
+                '''
+                archiveArtifacts 'panta-rhei/dist/*'
+            }
+        }
+        stage("Cleanup") {
+            steps {cleanWs notFailBuild: true}
+        }
+    }
+    post {
+        failure {
+            mail (
+                to: "elting@ceos-gmbh.de",
+                subject: "Build ${env.BUILD_NUMBER} of ${env.JOB_NAME} failed",
+                body: "${env.BUILD_URL}"
+            )
+        }
+    }
+}
