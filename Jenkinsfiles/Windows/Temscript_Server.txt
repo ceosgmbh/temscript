@@ -20,7 +20,7 @@ pipeline {
                     ], [
                         $class: 'CleanCheckout',
                         deleteUntrackedNestedRepositories: true
-                    ], 
+                    ]], 
                     userRemoteConfigs: [[
                         credentialsId: 'bobrd',
                         url: 'ssh://ceosgit.nodomain/var/lib/git/pyCorr.git'
