@@ -203,13 +203,13 @@
 #define DOUBLE_PROPERTY_GETTER(cls, propname) \
     static PyObject* cls##_get_##propname(cls* self, void*) \
     { \
-        //std::cout << "cls=" << #cls << "\n"; \
-        //std::cout << "propname=" << #propname << "\n"; \
+        /*std::cout << "cls=" << #cls << "\n";*/ \
+        /*std::cout << "propname=" << #propname << "\n";*/ \
         double value; \
-        //std::cout << "cls* self==" << self << "\n"; \
-        //std::cout << "cls* self->iface==" << self->iface << "\n"; \
+        /*std::cout << "cls* self==" << self << "\n";*/ \
+        /*std::cout << "cls* self->iface==" << self->iface << "\n";*/ \
         HRESULT result = self->iface->get_##propname(&value); \
-        //std::cout << "self->iface->get_##propname done." << "\n"; \
+        /*std::cout << "self->iface->get_##propname done." << "\n";*/ \
         if (FAILED(result)) { \
             raiseComError(result); \
             return NULL; \
@@ -400,31 +400,31 @@
 #define OBJECT_PROPERTY_GETTER_GUN1() \
     static PyObject* Instrument_get_Gun1(Instrument *self, void *) \
     { \
-        //std::cout << "start Instrument_get_Gun1()\n" << std::endl; \
+        /*std::cout << "start Instrument_get_Gun1()\n" << std::endl;*/ \
         TEMScripting::Gun* iface; \
-        //std::cout << "before get_Gun\n" << std::endl; \
+        /*std::cout << "before get_Gun\n" << std::endl;*/ \
         HRESULT result = self->iface->get_Gun(&iface); \
-        //std::cout << "after get_Gun\n" << std::endl; \
+        /*std::cout << "after get_Gun\n" << std::endl;*/ \
         if (FAILED(result)) { \
             raiseComError(result); \
             return NULL; \
         } \
-        //std::cout << "*Gun=" << iface << "\n" << std::endl; \
-        //std::cout << "before query Gun1\n" << std::endl; \
+        /*std::cout << "*Gun=" << iface << "\n" << std::endl;*/ \
+        /*std::cout << "before query Gun1\n" << std::endl;*/ \
         TEMScripting::Gun1* iface2; \
         HRESULT result2 = iface->QueryInterface(__uuidof(TEMScripting::Gun1), (void **)&iface2); \
         if (FAILED(result2)) { \
             raiseComError(result2); \
             return NULL; \
         } \
-        //std::cout << "after query Gun1\n" << std::endl; \
-        //std::cout << "iface2=" << iface2<< "\n" << std::endl; \
-        //std::cout << "before Gun1_create\n" << std::endl; \
+        /*std::cout << "after query Gun1\n" << std::endl;*/ \
+        /*std::cout << "iface2=" << iface2<< "\n" << std::endl;*/ \
+        /*std::cout << "before Gun1_create\n" << std::endl;*/ \
         PyObject* obj = Gun1_create(iface2); \
-        //std::cout << "after Gun1_create\n" << std::endl; \
+        /*std::cout << "after Gun1_create\n" << std::endl;*/ \
         if (!obj) \
             iface->Release(); \
-        //std::cout << "obj=" << obj << "\n" << std::endl; \
+        /*std::cout << "obj=" << obj << "\n" << std::endl;*/ \
         return obj; \
     }
 
