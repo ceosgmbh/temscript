@@ -404,7 +404,15 @@ class MicroscopeServerWithEvents:
                         web.put(r'/v1/{name:.+}', self.http_put_handler_v1),
                         ])
 
-        web.run_app(app, host=self.host, port=self.port)
+        # set up aiohttp - like run_app, but non-blocking, 
+        # see https://stackoverflow.com/questions/53465862/python-aiohttp-into-existing-event-loop
+        runner = web.AppRunner(app)
+        asyncio.ensure_future(runner.setup())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(runner.setup())
+        site = web.TCPSite(runner)
+        loop.run_until_complete(site.start())
+
 
 class MicroscopeException(Exception):
     """
@@ -491,14 +499,17 @@ class MicroscopeEventPublisher:
         self._task = None
 
     def start(self):
+        print("Starting server with events...")
         # reset microscope state
         self.microscope_server.reset_microscope_state()
         if not self.is_started:
+            print("Starting server now...")
             self.is_started = True
-            # Start task to call func periodically:
+            # configure polling task to check for Temscript changes periodically:
             self._task = asyncio.ensure_future(self._run())
 
     def stop(self):
+        print("Stopping server with events...")
         # reset microscope state
         self.microscope_server.reset_microscope_state()
         if self.is_started:
@@ -507,6 +518,8 @@ class MicroscopeEventPublisher:
             self._task.cancel()
 
     async def _run(self):
+        print("Starting to poll for Temscripting changes with a polling time of %ss..." %
+            self.sleep_time)
         while True:
             # sleep as configured for the instance
             await asyncio.sleep(self.sleep_time)
@@ -577,9 +590,17 @@ if __name__ == '__main__':
                                         host=host, port=port)
     microscope_event_publisher = MicroscopeEventPublisher(server, 1.0,
                                         tem_scripting_method_config)
+    # configure asyncio task for web server
+    server.run_server()
+    # configure asyncio task for polling temscript changes and
+    # publishing them via websocket
+    microscope_event_publisher.start()
+    # start asyncio event loop
+    loop = asyncio.get_event_loop()
     try:
-        microscope_event_publisher.start()
-        server.run_server()
+        loop.run_forever()
     finally:
+        print("Stopping server.")
         microscope_event_publisher.stop()
+        loop.stop()
 

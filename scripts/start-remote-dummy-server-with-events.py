@@ -20,7 +20,7 @@ try:
     tem_scripting_method_config = {
         # for meta data key 'condenser.mode'
         "instrument_mode_string": (str, 1),     # "TEM"/"STEM"
-        "illumination_mode":      (int, 1),    # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
+        "illumination_mode":      (int, 1),     # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
         "df_mode_string": (str, 1),             # e.g., "CARTESIAN", "OFF"
         "spot_size_index": (int, 1),            # e.g., 3
         "condenser_mode_string": (str, 1),      # e.g., "PROBE"
@@ -28,7 +28,7 @@ try:
         # for meta data key 'electron_gun.voltage'
         "voltage": (float, 1),                  # e.g., "200"
         # for backend key 'microscope.elementValues.HTOffset'
-        "voltage_offset": (float, 1),  # e.g., "0.1"
+        "voltage_offset": (float, 1),           # e.g., "0.1"
         # for meta data key "objective.mode -> projector.camera_length"
         "indicated_camera_length": (int, 1),    # e.g., "0", in meters (?)
         # for meta data key "objective.mode -> projector.magnification"
@@ -43,11 +43,20 @@ try:
     microscope_event_publisher = server_with_events.\
         MicroscopeEventPublisher(temscripting_server, 1.0,
                                  tem_scripting_method_config)
+    # configure asyncio task for web server
+    temscripting_server.run_server()
+    # configure asyncio task for polling temscript changes and
+    # publishing them via websocket
+    microscope_event_publisher.start()
+    # start asyncio event loop
+    loop = get_event_loop()
     try:
-        microscope_event_publisher.start()
-        temscripting_server.run_server()
+        loop.run_forever()
     finally:
+        print("Stopping server.")
         microscope_event_publisher.stop()
+        loop.stop()
+
 except Exception as exc:
     print("Caught exception %s" % exc)
     print(traceback.format_exc())

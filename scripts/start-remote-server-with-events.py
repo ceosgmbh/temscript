@@ -1,5 +1,6 @@
 from temscript import server_with_events
 from temscript.microscope import Microscope
+from asyncio import get_event_loop
 import traceback
 import sys
 
@@ -41,11 +42,20 @@ try:
     microscope_event_publisher = server_with_events. \
         MicroscopeEventPublisher(temscripting_server, 1.0,
                                  tem_scripting_method_config)
+    # configure asyncio task for web server
+    temscripting_server.run_server()
+    # configure asyncio task for polling temscript changes and
+    # publishing them via websocket
+    microscope_event_publisher.start()
+    # start asyncio event loop
+    loop = get_event_loop()
     try:
-        microscope_event_publisher.start()
-        temscripting_server.run_server()
+        loop.run_forever()
     finally:
+        print("Stopping server.")
         microscope_event_publisher.stop()
+        loop.stop()
+
 except Exception as exc:
     print("Caught exception %s" % exc)
     print(traceback.format_exc())
