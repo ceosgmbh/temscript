@@ -203,13 +203,13 @@
 #define DOUBLE_PROPERTY_GETTER(cls, propname) \
     static PyObject* cls##_get_##propname(cls* self, void*) \
     { \
-        std::cout << "cls=" << #cls << "\n"; \
-        std::cout << "propname=" << #propname << "\n"; \
+        //std::cout << "cls=" << #cls << "\n"; \
+        //std::cout << "propname=" << #propname << "\n"; \
         double value; \
-        std::cout << "cls* self==" << self << "\n"; \
-        std::cout << "cls* self->iface==" << self->iface << "\n"; \
+        //std::cout << "cls* self==" << self << "\n"; \
+        //std::cout << "cls* self->iface==" << self->iface << "\n"; \
         HRESULT result = self->iface->get_##propname(&value); \
-        std::cout << "self->iface->get_##propname done." << "\n"; \
+        //std::cout << "self->iface->get_##propname done." << "\n"; \
         if (FAILED(result)) { \
             raiseComError(result); \
             return NULL; \
@@ -400,48 +400,34 @@
 #define OBJECT_PROPERTY_GETTER_GUN1() \
     static PyObject* Instrument_get_Gun1(Instrument *self, void *) \
     { \
-        std::cout << "start Instrument_get_Gun1()\n" << std::endl; \
+        //std::cout << "start Instrument_get_Gun1()\n" << std::endl; \
         TEMScripting::Gun* iface; \
-        std::cout << "before get_Gun\n" << std::endl; \
+        //std::cout << "before get_Gun\n" << std::endl; \
         HRESULT result = self->iface->get_Gun(&iface); \
-        std::cout << "after get_Gun\n" << std::endl; \
+        //std::cout << "after get_Gun\n" << std::endl; \
         if (FAILED(result)) { \
             raiseComError(result); \
             return NULL; \
         } \
-        std::cout << "*Gun=" << iface << "\n" << std::endl; \
-        std::cout << "before query Gun1\n" << std::endl; \
+        //std::cout << "*Gun=" << iface << "\n" << std::endl; \
+        //std::cout << "before query Gun1\n" << std::endl; \
         TEMScripting::Gun1* iface2; \
         HRESULT result2 = iface->QueryInterface(__uuidof(TEMScripting::Gun1), (void **)&iface2); \
         if (FAILED(result2)) { \
             raiseComError(result2); \
             return NULL; \
         } \
-        std::cout << "after query Gun1\n" << std::endl; \
-        std::cout << "iface2=" << iface2<< "\n" << std::endl; \
-        std::cout << "before Gun1_create\n" << std::endl; \
+        //std::cout << "after query Gun1\n" << std::endl; \
+        //std::cout << "iface2=" << iface2<< "\n" << std::endl; \
+        //std::cout << "before Gun1_create\n" << std::endl; \
         PyObject* obj = Gun1_create(iface2); \
-        std::cout << "after Gun1_create\n" << std::endl; \
+        //std::cout << "after Gun1_create\n" << std::endl; \
         if (!obj) \
             iface->Release(); \
-        std::cout << "obj=" << obj << "\n" << std::endl; \
+        //std::cout << "obj=" << obj << "\n" << std::endl; \
         return obj; \
     }
- //OBJECT_PROPERTY_GETTER(cls=Instrument, propname=Gun1, prop_cls=Gun, prop_iface=TEMScripting::Gun1)
-//#define OBJECT_PROPERTY_GETTER3(cls, propname, propname_get, prop_cls, prop_iface) \
-//    static PyObject* cls##_get_##propname(cls *self, void *) \
-//    { \
-//        prop_iface* iface; \
-//        HRESULT result = self->iface->get_##propname_get(&iface); \
-//        if (FAILED(result)) { \
-//            raiseComError(result); \
-//            return NULL; \
-//        } \
-//        PyObject* obj = prop_cls##_create(iface); \
-//        if (!obj) \
-//            iface->Release(); \
-//        return obj; \
-//    }
+
 #define OBJECT_PROPERTY_GETTER(cls, propname, prop_cls, prop_iface) \
     static PyObject* cls##_get_##propname(cls *self, void *) \
     { \
@@ -457,43 +443,6 @@
         return obj; \
     }
 
-///**
-// * Implement static function <cls>_get_<propname>, that queries <prop_iface> from COM object with function get_<propname>
-// * and converts the value into the python type <prop_cls> and returns it.
-// **/
-//#define OBJECT_PROPERTY_GETTER2(cls, propname, prop_cls, prop_iface_base, prop_iface) \
-//    static PyObject* cls##_get_##propname(cls *self, void *) \
-//    { \
-//        prop_iface_base* iface_base; \
-//        prop_iface* iface; \
-//        HRESULT result = self->iface->get_##propname(&iface_base); \
-//        if (FAILED(result)) { \
-//            raiseComError(result); \
-//            return NULL; \
-//        } \
-//        PyObject* obj = prop_cls##_create(iface_base); \
-//        if (!obj) \
-//            iface->Release(); \
-//        return obj; \
-//    }
-
-/**
-    prop_iface_derived* prop_cls_derived##_query_2(PyObject* self) \
-    { \
-        if (!self || !PyObject_TypeCheck(self, &prop_cls_derived##_Type)) \
-            return NULL; \
-        return reinterpret_cast<prop_cls_derived*>(self)->iface; \
-    } \
-**/
-/**
-    PyObject* prop_cls_derived##_query_2(PyObject* self) \
-    { \
-        if (!self || !PyObject_TypeCheck(self, &prop_cls_derived##_Type)) \
-            return NULL; \
-        return reinterpret_cast<prop_cls_derived*>(self); \
-    } \
-
-**/
 /**
  * Implement static function <cls>_get_<propname>, that queries <prop_iface_derived> from a derived COM object with function get_<propname_derived>
  * and converts the value into the python type <prop_cls_derived> and returns it.
