@@ -1,17 +1,28 @@
 from temscript import server_with_events
 from temscript.null_microscope import NullMicroscope
+from temscript.version import __version__
 from asyncio import get_event_loop
+
 import traceback
-import sys
+
+from functools import partial
+from temscript import logger
+
+# configure logger, configuration file (under %localappdata%) and parse command line arguments
+(config, port) = server_with_events.configure_server()
+log = logger.getLoggerForModule("TemscriptingServer")
+log.info("configuration=%s" % config)
+log.info("port=%s" % port)
 
 # to be started on the Titan microscope PC
-print("Starting DUMMY temscripting Microscope HTTP Server with Websocket Events...")
+log.info("Starting DUMMY temscripting Microscope HTTP Server with "
+         "Websocket Events version %s..." % __version__)
 try:
-    # start remote server with events on localhost, port 8080
+    # start remote server with events on localhost with default port 8080
     microscope = NullMicroscope()
 
     temscripting_server = server_with_events.MicroscopeServerWithEvents(
-        microscope=microscope, host="0.0.0.0", port=8080)
+        microscope=microscope, host="0.0.0.0", port=port)
     # define all TEMScripting methods which should be polled
     # during one polling event via the web server.
     # value is a tuple consisting of a conversion method
@@ -58,8 +69,8 @@ try:
         loop.stop()
 
 except Exception as exc:
-    print("Caught exception %s" % exc)
-    print(traceback.format_exc())
-    wait = input("Press Enter to exit server.")
+    log.exception("Caught exception %s" % exc)
+    #print(traceback.format_exc())
+    #wait = input("Press Enter to exit server.")
 
-print("Done.")  
+log.info("Done.")

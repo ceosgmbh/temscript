@@ -1,19 +1,27 @@
 #!/usr/bin/python
 from __future__ import division, print_function
 
-# require python 3.5 for aiohttp
+# require python 3.8 for aiohttp
 import sys
-if sys.hexversion < 0x03050000:
-    sys.exit("Python 3.5 or newer is required to run this program.")
+if sys.hexversion < 0x03080000:
+    sys.exit("Python 3.8 (32 bit) or newer is required to run this program.")
+
+import os
+import argparse
 
 import numpy as np
 import json
 from io import BytesIO
 import asyncio
 from aiohttp import web, WSMsgType
-from contextlib import suppress
-
 import traceback
+
+from functools import partial
+from temscript import server_config
+from temscript import logger
+
+# initialize logger
+log = logger.getLoggerForModule("TemscriptingServer")
 
 class MicroscopeServerWithEvents:
     """
@@ -553,9 +561,71 @@ class MicroscopeEventPublisher:
             traceback.print_exc()
             print("Polling failed: %s" % exc)
 
-if __name__ == '__main__':
-    host="0.0.0.0"
+def configure_server():
+    """
+    Configure logger, configuration file under %localappdata% and
+    parse command line arguments
+    ::return A tuple containing
+            1. configuration dict
+            2. the server port to use
+    """
+    # parse arguments
+    parser = argparse.ArgumentParser(
+        description='HTTP+Websocket Server for accessing Temscripting via web and sending change events via Websocket.')
+    parser.add_argument('--port', type=str, action='store', default='8080',
+                        help='The HTTP+Websocket server port.')
+    logger.add_logger_arguments(parser)
+
+    args = parser.parse_args()
+    logger.configure_logger(log, args)
+
+    # load configuration file from %localappdata%
+    config = server_config.Config("TemscriptingServer", local_appdata=True)
+    config.loadConfigFile()
+    log.debug("Loaded configuration from file:\n%s", str(config))
+
     port=8080
+    config.setdefault('port', 8080)
+    if args.port is not None:
+        # command line argument for port wins over config file
+        port = args.port
+    else:
+        if "port" not in config:
+            # HTTP+Websocket server default port is 8080
+            config["port"] = 8080
+            log.debug("Starting server on port: %s", config["port"])
+        port = config["port"]
+
+    # TODO: set arguments/config for polling_freq and possibly logger
+
+    config.saveConfigFile()
+    return (config,port)
+
+    # # add shutdown hook (currently not used except for an INFO print)
+    # server = None # add later for controlled shutdown
+    # def shutdown(server, sig, func=None):
+    #     try:
+    #         log.info("Shutting down server.")
+    #         # server.shutdown()
+    #     except Exception as e:
+    #         log.error(f"Shutdown failed: {e}: {traceback.format_exc()}")
+    #     else:
+    #         log.info(f"Shutdown completed")
+    #
+    # if os.name == "nt":
+    #     import win32api
+    #     win32api.SetConsoleCtrlHandler(partial(shutdown, server), True)
+    # else:
+    #     import signal
+    #     signal.signal(signal.SIGTERM, partial(shutdown, server))
+
+
+if __name__ == '__main__':
+    # configure logger, configuration file and parse command line arguments
+    (config,port) = configure_server()
+    log.debug("configuration file=%s" % config)
+    log.debug("port=%s" % config)
+
     # define all TEMScripting methods which should be polled
     # during one polling event via the web server.
     # value is a tuple consisting of a conversion method
@@ -584,8 +654,13 @@ if __name__ == '__main__':
         "stem_magnification": (float, 1),       # e.g., "6000"
     }
 
-    from .microscope import Microscope
+    log.info("Using HTTP+Websocket port %s..." % port)
+
+    # startup HTTP+Websocket server
+    from temscript import Microscope
+    #from microscope import Microscope
     microscope = Microscope()
+    host="0.0.0.0"
     server = MicroscopeServerWithEvents(microscope=microscope,
                                         host=host, port=port)
     microscope_event_publisher = MicroscopeEventPublisher(server, 1.0,
@@ -600,7 +675,7 @@ if __name__ == '__main__':
     try:
         loop.run_forever()
     finally:
-        print("Stopping server.")
+        log.info("Stopping server.")
         microscope_event_publisher.stop()
         loop.stop()
 
