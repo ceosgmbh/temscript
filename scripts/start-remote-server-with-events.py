@@ -11,10 +11,11 @@ from temscript import logger
 # to be started on the Titan microscope PC
 
 # configure logger, configuration file (under %localappdata%) and parse command line arguments
-(config, port) = server_with_events.configure_server()
+(config, port, polling_sleep) = server_with_events.configure_server()
 log = logger.getLoggerForModule("TemscriptingServer")
-log.info("configuration=%s" % config)
+log.info("configuration read from file=%s" % config)
 log.info("port=%s" % port)
+log.info("polling sleep=%ss" % polling_sleep)
 
 log.info("Starting temscripting Microscope HTTP Server with "
          "Websocket Events version %s..." % __version__)
@@ -52,7 +53,7 @@ try:
     }
 
     microscope_event_publisher = server_with_events. \
-        MicroscopeEventPublisher(temscripting_server, 1.0,
+        MicroscopeEventPublisher(temscripting_server, polling_sleep,
                                  tem_scripting_method_config)
     # configure asyncio task for web server
     temscripting_server.run_server()

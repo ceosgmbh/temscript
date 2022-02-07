@@ -486,7 +486,7 @@ class MicroscopeEventPublisher:
     to the microscope state.
     :param microscope_server: The server instance
     :param sleep_time: The sleeping time between
-            polling calls.
+            polling calls in seconds.
     :param polling_config: A configuration dict of
             methods and return types to poll.
             value is a tuple consisting of a conversion method
@@ -572,8 +572,10 @@ def configure_server():
     # parse arguments
     parser = argparse.ArgumentParser(
         description='HTTP+Websocket Server for accessing Temscripting via web and sending change events via Websocket.')
-    parser.add_argument('--port', type=str, action='store', default='8080',
+    parser.add_argument('--port', type=int, action='store',
                         help='The HTTP+Websocket server port.')
+    parser.add_argument('--pollsleep', type=float, action='store',
+                        help='The Temscripting polling sleeping time (in seconds) between two polling actions.')
     logger.add_logger_arguments(parser)
 
     args = parser.parse_args()
@@ -585,7 +587,7 @@ def configure_server():
     log.debug("Loaded configuration from file:\n%s", str(config))
 
     port=8080
-    config.setdefault('port', 8080)
+    #config.setdefault('port', 8080)
     if args.port is not None:
         # command line argument for port wins over config file
         port = args.port
@@ -593,32 +595,23 @@ def configure_server():
         if "port" not in config:
             # HTTP+Websocket server default port is 8080
             config["port"] = 8080
-            log.debug("Starting server on port: %s", config["port"])
         port = config["port"]
+    log.debug("Starting server on port: %s", port)
 
-    # TODO: set arguments/config for polling_freq and possibly logger
+    polling_sleep=1.0
+    #config.setdefault('polling', 1.0)
+    if args.pollsleep is not None:
+        # command line argument for port wins over config file
+        polling_sleep = args.pollsleep
+    else:
+        if "pollsleep" not in config:
+            config["pollsleep"] = 1.0
+        polling_sleep = config["pollsleep"]
+    log.debug("Starting server with polling sleep of %s s", polling_sleep)
+    # TODO: set arguments/config for logger
 
     config.saveConfigFile()
-    return (config,port)
-
-    # # add shutdown hook (currently not used except for an INFO print)
-    # server = None # add later for controlled shutdown
-    # def shutdown(server, sig, func=None):
-    #     try:
-    #         log.info("Shutting down server.")
-    #         # server.shutdown()
-    #     except Exception as e:
-    #         log.error(f"Shutdown failed: {e}: {traceback.format_exc()}")
-    #     else:
-    #         log.info(f"Shutdown completed")
-    #
-    # if os.name == "nt":
-    #     import win32api
-    #     win32api.SetConsoleCtrlHandler(partial(shutdown, server), True)
-    # else:
-    #     import signal
-    #     signal.signal(signal.SIGTERM, partial(shutdown, server))
-
+    return (config,port,polling_sleep)
 
 if __name__ == '__main__':
     # configure logger, configuration file and parse command line arguments
@@ -663,7 +656,8 @@ if __name__ == '__main__':
     host="0.0.0.0"
     server = MicroscopeServerWithEvents(microscope=microscope,
                                         host=host, port=port)
-    microscope_event_publisher = MicroscopeEventPublisher(server, 1.0,
+    polling_sleep=1.0
+    microscope_event_publisher = MicroscopeEventPublisher(server, polling_sleep,
                                         tem_scripting_method_config)
     # configure asyncio task for web server
     server.run_server()
