@@ -14,9 +14,9 @@ import json
 from io import BytesIO
 import asyncio
 from aiohttp import web, WSMsgType
-import traceback
+# import traceback
 
-from functools import partial
+# from functools import partial
 from temscript import server_config
 from temscript import logger
 
@@ -49,7 +49,7 @@ class MicroscopeServerWithEvents:
         self.host = host
         self.port = port
         self.microscope = microscope
-        print("Configuring web server for host=%s, port=%s" % (self.host, self.port))
+        log.info("Configuring web server for host=%s, port=%s" % (self.host, self.port))
 
         # a dict for storing polling results
         self.microscope_state = dict()
@@ -193,7 +193,7 @@ class MicroscopeServerWithEvents:
             response = self.microscope.acquire(*detectors)
         else:
             raise MicroscopeException('Unknown endpoint: %s' % command)
-        # print('Returning response %s for command %s...' % (response, command))
+        # log.debug('Returning response %s for command %s...' % (response, command))
         return response
 
     async def http_put_handler_v1(self, request):
@@ -301,13 +301,13 @@ class MicroscopeServerWithEvents:
         :param request: The connection request
         :return: the websocket response
         """
-        print('Websocket client session opened.')
+        log.debug('Websocket client session opened.')
         # available options for WebSocketResponse client session:
         #   autoping=True (default), heartbeat=5 (necessary for pings)
         #   receive_timeout=10
         ws = web.WebSocketResponse()
         remote_ip = request.remote
-        print('Websocket handler for IP %s created.' % remote_ip)
+        log.info('Websocket handler for IP %s created.' % remote_ip)
         await ws.prepare(request)
         # add client to set
         await self.add_websocket_client(ws)
@@ -316,24 +316,24 @@ class MicroscopeServerWithEvents:
             async for msg in ws:
                 if msg.type == WSMsgType.TEXT:
                     if msg.data != 'close':
-                        print('websocket connection received unsupported text message: "%s"' % msg.data)
+                        log.warn('websocket connection received unsupported text message: "%s"' % msg.data)
                     await ws.close()
                 elif msg.type == WSMsgType.PING:
                     pass
-                    # print('websocket connection received PING')
+                    # log.debug('websocket connection received PING')
                 elif msg.type == WSMsgType.PONG:
                     pass
-                    # print('websocket connection received PONG')
+                    # log.debug('websocket connection received PONG')
                 elif msg.type == WSMsgType.ERROR:
                     await self.remove_websocket_client(ws)
-                    print('websocket connection closed with exception %s' %
+                    log.exception('websocket connection closed with exception %s' %
                           ws.exception())
                     await ws.close()
                 else:
-                    print('Received unsupported websocket message type "%s": closing connection' % msg.type)
+                    log.warn('Received unsupported websocket message type "%s": closing connection' % msg.type)
                     await ws.close()
         finally:
-            print('Websocket client session closed for IP %s' % remote_ip)
+            log.info('Websocket client session closed for IP %s' % remote_ip)
             await ws.close()
             await self.remove_websocket_client(ws)
 
@@ -341,23 +341,23 @@ class MicroscopeServerWithEvents:
 
     async def add_websocket_client(self, ws):
         async with self.clients_lock:
-            print('number of clients before adding new client: %s ' %
-                  len(self.clients))
+            # log.debug('number of clients before adding new client: %s ' %
+            #       len(self.clients))
             self.clients.add(ws)
-            print('number of clients after adding new client: %s ' %
+            log.debug('number of clients after adding new client: %s ' %
                   len(self.clients))
         async with self.microscope_state_lock:
             if self.microscope_state:
-                print('Sending microscope state to new client: %s :' %
+                log.info('Sending microscope state to new client: %s :' %
                       self.microscope_state)
                 await ws.send_json(self.microscope_state)
 
     async def remove_websocket_client(self, ws):
         async with self.clients_lock:
-            print("number of clients before removing client: %s " %
-                  len(self.clients))
+            # log.debug("number of clients before removing client: %s " %
+            #       len(self.clients))
             self.clients.remove(ws)
-            print("number of clients after removing client: %s " %
+            log.debug("number of clients after removing client: %s " %
                   len(self.clients))
 
     async def broadcast_to_websocket_clients(self, obj):
@@ -394,7 +394,7 @@ class MicroscopeServerWithEvents:
                     # update value
                     self.microscope_state[command] = new_result
         if len(changes) > 0:
-            print("changes=%s"  % changes)
+            log.info("microscope state changed: %s" % changes)
         if changes:
             await self.broadcast_to_websocket_clients(changes)
 
@@ -402,7 +402,7 @@ class MicroscopeServerWithEvents:
         self.microscope_state = dict()
 
     def run_server(self):
-        print("Starting web server with events under host=%s, port=%s" % (self.host, self.port))
+        log.info("Starting HTTP+websocket server with events under host=%s, port=%s" % (self.host, self.port))
         app = web.Application()
         # add routes for
         # - HTTP-GET/PUT, e.g. http://127.0.0.1:8080/v1/projection_mode
@@ -507,17 +507,17 @@ class MicroscopeEventPublisher:
         self._task = None
 
     def start(self):
-        print("Starting server with events...")
+        log.debug("Starting server with events...")
         # reset microscope state
         self.microscope_server.reset_microscope_state()
         if not self.is_started:
-            print("Starting server now...")
+            log.debug("Starting server now...")
             self.is_started = True
             # configure polling task to check for Temscript changes periodically:
             self._task = asyncio.ensure_future(self._run())
 
     def stop(self):
-        print("Stopping server with events...")
+        log.info("Stopping server with events...")
         # reset microscope state
         self.microscope_server.reset_microscope_state()
         if self.is_started:
@@ -526,7 +526,7 @@ class MicroscopeEventPublisher:
             self._task.cancel()
 
     async def _run(self):
-        print("Starting to poll for Temscripting changes with a polling time of %ss..." %
+        log.info("Starting to poll for Temscripting changes with a polling time of %ss..." %
             self.sleep_time)
         while True:
             # sleep as configured for the instance
@@ -535,7 +535,7 @@ class MicroscopeEventPublisher:
             await self.polling_func()
 
     async def check_for_microscope_changes(self):
-        #print("checking for microscope changes...")
+        #log.debug("checking for microscope changes...")
         try:
             changed = {}
             all_results = dict()
@@ -545,21 +545,21 @@ class MicroscopeEventPublisher:
                     # (here: imply parameterless command)
                     result_raw = self.microscope_server.do_GET_V1(get_command,
                                                               None)
-                    #print("found %s=%s..." %
+                    #log.debug("found %s=%s..." %
                     #      (get_command, result_raw))
                     casting_func = self.polling_config[get_command][0]
                     result = casting_func(result_raw)
-                    # print("Adding %s=%s to results..." %
+                    # log.debug("Adding %s=%s to results..." %
                     #        (get_command, result))
                     all_results[get_command] = result
                 except Exception as exc:
-                    print("TEMScripting method '{}' failed "
+                    log.exception("TEMScripting method '{}' failed "
                         "while polling: %s" % (get_command, exc))
             await self.microscope_server.change_microscope_state(all_results)
 
         except Exception as exc:
-            traceback.print_exc()
-            print("Polling failed: %s" % exc)
+            #traceback.print_exc()
+            log.exception("Polling failed: %s" % exc)
 
 def configure_server():
     """
