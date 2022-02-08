@@ -597,7 +597,6 @@ def configure_server():
         if "loglevel" not in config:
             config["loglevel"] = "INFO"
         loglevel = config["loglevel"]
-    log.info("Starting server with loglevel %s", loglevel)
 
     logfile=None
     if args.logfile is not None:
@@ -606,9 +605,9 @@ def configure_server():
     else:
         # if logfile does not exist in config: keep value None!
         if "logfile" not in config:
-            config["logfile"] = ""
-    if logfile is not None:
-        log.info("Starting server with logfile %s", logfile)
+            # TODO: better use appdirs library here
+            config["logfile"] = "C:\\Temp\\TemscriptingServer.log"
+        logfile = config["logfile"]
 
     silent=None
     if args.silent is not None:
@@ -620,11 +619,14 @@ def configure_server():
             # HTTP+Websocket server default port is 8080
             config["silent"] = True
         silent = config["silent"]
-    if silent is not None and silent:
-        log.info("Starting server silently.")
 
     # configure logger
     logger.configure_logger(log, loglevel, logfile, silent)
+    log.info("Starting server with loglevel %s", loglevel)
+    if logfile is not None and len(logfile)>0:
+        log.info("Starting server with logfile %s", logfile)
+    if silent is not None and silent:
+        log.info("Starting server silently.")
 
     port=8080
     if args.port is not None:
