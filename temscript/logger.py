@@ -2,7 +2,7 @@
 Collection of small function that do not fit elsewhere.
 """
 import logging
-#from logging import getLogger, setLoggerClass, getLoggerClass, Logger, Formatter
+from logging.handlers import RotatingFileHandler
 
 fmt = logging.Formatter('%(asctime)s %(levelname)s %(process)d#%(thread)d %(module)s:%(lineno)d %(message)s')
 std = logging.StreamHandler()
@@ -14,25 +14,25 @@ LOGLEVEL= { 'CRITICAL': logging.CRITICAL,
             'DEBUG': logging.DEBUG }
 
 def add_logger_arguments(parser):
-    parser.add_argument('--quiet', action='store_true', help='suppress logging to console')
+    parser.add_argument('--silent', action='store', help='suppress logging to console')
     parser.add_argument('--logfile', action='store', type=str, help='Log to file', default=None)
-    parser.add_argument('--loglevel', action='store', choices=LOGLEVEL.keys(), default='INFO',
+    parser.add_argument('--loglevel', action='store', choices=LOGLEVEL.keys(), default=None,
                         help='Select log level (default: INFO)')
 
-def configure_logger(log, args):
-    log.setLevel(LOGLEVEL[args.loglevel])
+def configure_logger(log, loglevel, logfile, silent):
+    log.setLevel(LOGLEVEL[loglevel])
 
-    if not args.quiet:
+    if silent is not None and not silent:
         std.setFormatter(fmt)
         log.addHandler(std)
-    if args.logfile is not None:
+    if logfile is not None:
 
         def modify_name(name):
             toks = name.split('.')
             name = '.'.join(toks[:-2]+[toks[-1],toks[-2]])
             return name
 
-        hdl = logging.RotatingFileHandler(filename=args.logfile, maxBytes=1000000,
+        hdl = RotatingFileHandler(filename=logfile, maxBytes=1000000,
                                           backupCount=3)
         hdl.setFormatter(fmt)
         hdl.namer = modify_name

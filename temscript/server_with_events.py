@@ -576,18 +576,57 @@ def configure_server():
                         help='The HTTP+Websocket server port.')
     parser.add_argument('--pollsleep', type=float, action='store',
                         help='The Temscripting polling sleeping time (in seconds) between two polling actions.')
+    # add arguments for logging: "loglevel", "logfile", "silent"
     logger.add_logger_arguments(parser)
-
+    # parse arguments
     args = parser.parse_args()
-    logger.configure_logger(log, args)
 
     # load configuration file from %localappdata%
     config = server_config.Config("TemscriptingServer", local_appdata=True)
     config.loadConfigFile()
-    log.debug("Loaded configuration from file:\n%s", str(config))
+    log.info("Loaded configuration from file:\n%s", str(config))
+
+    # check command line arguments vs. config file arguments:
+    # - command line values win over config file values
+    # - defaults will be added to config file in case they do not yet exist
+    # - config file is saved at the end of the method in "%localappdata%" resp "~/.config"
+    loglevel="INFO"
+    if args.loglevel is not None:
+        loglevel = args.loglevel
+    else:
+        if "loglevel" not in config:
+            config["loglevel"] = "INFO"
+        loglevel = config["loglevel"]
+    log.info("Starting server with loglevel %s", loglevel)
+
+    logfile=None
+    if args.logfile is not None:
+        # command line argument for logfile wins over config file
+        logfile = args.logfile
+    else:
+        # if logfile does not exist in config: keep value None!
+        if "logfile" not in config:
+            config["logfile"] = ""
+    if logfile is not None:
+        log.info("Starting server with logfile %s", logfile)
+
+    silent=None
+    if args.silent is not None:
+        # command line argument for silent wins over config file
+        silent = args.silent
+    else:
+        # if silent does not exist in config: keep value None!
+        if "silent" not in config:
+            # HTTP+Websocket server default port is 8080
+            config["silent"] = True
+        silent = config["silent"]
+    if silent is not None and silent:
+        log.info("Starting server silently.")
+
+    # configure logger
+    logger.configure_logger(log, loglevel, logfile, silent)
 
     port=8080
-    #config.setdefault('port', 8080)
     if args.port is not None:
         # command line argument for port wins over config file
         port = args.port
@@ -599,7 +638,6 @@ def configure_server():
     log.debug("Starting server on port: %s", port)
 
     polling_sleep=1.0
-    #config.setdefault('polling', 1.0)
     if args.pollsleep is not None:
         # command line argument for port wins over config file
         polling_sleep = args.pollsleep
@@ -608,16 +646,18 @@ def configure_server():
             config["pollsleep"] = 1.0
         polling_sleep = config["pollsleep"]
     log.debug("Starting server with polling sleep of %s s", polling_sleep)
-    # TODO: set arguments/config for logger
 
+    # save config file (containing defaults for new parameters)
     config.saveConfigFile()
-    return (config,port,polling_sleep)
+    # return resulting values (command line arguments win over config file)
+    return config,port,polling_sleep
 
 if __name__ == '__main__':
     # configure logger, configuration file and parse command line arguments
-    (config,port) = configure_server()
+    (config,port,polling_sleep) = configure_server()
     log.debug("configuration file=%s" % config)
     log.debug("port=%s" % config)
+    log.debug("polling sleep=%ss" % polling_sleep)
 
     # define all TEMScripting methods which should be polled
     # during one polling event via the web server.
@@ -656,7 +696,6 @@ if __name__ == '__main__':
     host="0.0.0.0"
     server = MicroscopeServerWithEvents(microscope=microscope,
                                         host=host, port=port)
-    polling_sleep=1.0
     microscope_event_publisher = MicroscopeEventPublisher(server, polling_sleep,
                                         tem_scripting_method_config)
     # configure asyncio task for web server
