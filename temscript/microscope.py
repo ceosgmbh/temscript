@@ -37,9 +37,10 @@ class Microscope(object):
     def __init__(self):
         from .instrument import GetInstrument
         tem = GetInstrument()
+        self._tem = tem
         self._tem_instrument = tem
         self._tem_gun = tem.Gun
-        self._tem_gun1 = tem.Gun1
+        self._tem_gun1 = None
         self._tem_illumination = tem.Illumination
         self._tem_projection = tem.Projection
         self._tem_stage = tem.Stage
@@ -93,8 +94,9 @@ class Microscope(object):
         :return: Float with high voltage offset
         """
         state = self._tem_gun.HTState
+        tem_gun1 = self.get_gun1()
         if state == HighTensionState.ON:
-            return self._tem_gun1.HighVoltageOffset
+            return tem_gun1.HighVoltageOffset
         else:
             return 0.0
 
@@ -108,7 +110,8 @@ class Microscope(object):
         :param voltage_offset 
         :type voltage_offset Float with high voltage offset in Volts
         """
-        self._tem_gun1.HighVoltageOffset = voltage_offset 
+        tem_gun1 = self.get_gun1()
+        tem_gun1.HighVoltageOffset = voltage_offset
 
     def get_voltage_offset_range(self):
         """
@@ -119,7 +122,8 @@ class Microscope(object):
 
         :return: Tuple with high voltage offset range (min, max).
         """
-        return self._tem_gun1.GetHighVoltageOffsetRange()
+        tem_gun1 = self.get_gun1()
+        return tem_gun1.GetHighVoltageOffsetRange()
  
     def get_vacuum(self):
         """
@@ -906,3 +910,11 @@ class Microscope(object):
             "diffraction_shift": self.get_diffraction_shift(),
         }
         return state
+    
+    def get_gun1(self):
+        """
+        Queries the Gun1 interface (in case it is not yet initialized) and returns it.
+        :return: The Gun1 interface
+        """
+        if self._tem_gun1 is None:
+            self._tem_gun1 = self._tem.Gun1
