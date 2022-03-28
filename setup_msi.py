@@ -121,14 +121,22 @@ msi_definitions = {
         'upgrade_code': '{3F5EB5E6-6934-4465-88BE-F1CA715D4F8D}',
         'scripts': [
             {'script': 'scripts/start-remote-server-with-events.py',
-             'shortcut_name': 'Temscripting Server',
+             'shortcut_name': 'Temscripting Server for Titan 7',
              'base': None,  # show console
              'target_name': 'temscript_server.exe'},
-            {'script': 'scripts/start-remote-dummy-server-with-events.py',
-             'shortcut_name': 'Temscripting Dummy Server',
+            {'script': 'scripts/start-remote-server-with-events-legacy-titan.py',
+             'shortcut_name': 'Temscripting Server for Titan 6',
              'base': None,  # show console
-             'target_name': 'temscript_dummy_server.exe'}],
-        #'includes': [],
+             'target_name': 'temscript_server_legacy_titan.exe'},
+            {'script': 'scripts/start-remote-dummy-server-with-events.py',
+             # 'shortcut_name': 'Temscripting Dummy Server for Titan 7.x',
+             'base': None,  # show console
+             'target_name': 'temscript_dummy_server.exe'},
+            {'script': 'scripts/start-remote-dummy-server-with-events-legacy-titan.py',
+             # 'shortcut_name': 'Temscripting Dummy Server for Titan 6.x',
+             'base': None,  # show console
+             'target_name': 'temscript_dummy_server_legacy_titan.exe'}],
+#'includes': [],
         'includes': default_includes,
         'packages': default_packages,
         'data_files': [] },
