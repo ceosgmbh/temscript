@@ -11,5 +11,6 @@ importlib-metadata==4.10.1
 lief==0.11.5
 multidict==6.0.2
 numpy==1.22.1
+setuptools==60.10.0
 yarl==1.7.2
 zipp==3.7.0
