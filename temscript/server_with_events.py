@@ -679,7 +679,7 @@ if __name__ == '__main__':
         # for backend key 'microscope.elementValues.HTOffset'
         "voltage_offset": (float, 1),           # e.g., "0.1"
         # for meta data key "objective.mode -> projector.camera_length"
-        "indicated_camera_length": (int, 1),    # e.g., "0", in meters (?)
+        "indicated_camera_length": (float, 1),  # e.g., "0.028999", in meters
         # for meta data key "objective.mode -> projector.magnification"
         "indicated_magnification": (float, 1),  # e.g., 200000.0
         # for meta data key "objective.mode -> projector.mode"

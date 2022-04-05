@@ -187,7 +187,7 @@ def main(product_name, description, upgrade_code, scripts, packages, includes,
         'license': 'Copyright 2020-%s CEOS GmbH. All rights reserved.' %
                    date.today().year,
         'long_description': description,
-        'version': '2.1.0', ###getVersion(debug=True).release,
+        'version': '2.1.1', ###getVersion(debug=True).release,
         'url': 'http://ceos-gmbh.de/',
         'data_files': data_files,
         'cmdclass': {
