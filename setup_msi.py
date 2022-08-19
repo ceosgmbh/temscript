@@ -104,7 +104,7 @@ def add_prefix(prefix, names, sep='.'):
 # Also list dependencies cx_freeze does not include automatically for various
 # reasons.
 default_includes = [
-    'asyncio', 'json', 'numpy', 'socket', 'aiohttp',
+    'appdirs', 'asyncio', 'json', 'numpy', 'socket', 'aiohttp',
     ]
 
 all_packages = find_packages('temscript') + \

@@ -14,6 +14,7 @@ import json
 from io import BytesIO
 import asyncio
 from aiohttp import web, WSMsgType
+from appdirs import user_log_dir
 # import traceback
 
 # from functools import partial
@@ -605,8 +606,9 @@ def configure_server():
     else:
         # if logfile does not exist in config: keep value None!
         if "logfile" not in config:
-            # TODO: better use appdirs library here
-            config["logfile"] = "C:\\Temp\\TemscriptingServer.log"
+            log_dir = user_log_dir(appname='Temscripting', appauthor='CEOS')
+            os.makedirs(log_dir)
+            config["logfile"] = os.path.join(log_dir, 'server_with_events.log')
         logfile = config["logfile"]
 
     silent=None
