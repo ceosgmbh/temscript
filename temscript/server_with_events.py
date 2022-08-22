@@ -419,7 +419,7 @@ class MicroscopeServerWithEvents:
         asyncio.ensure_future(runner.setup())
         loop = asyncio.get_event_loop()
         loop.run_until_complete(runner.setup())
-        site = web.TCPSite(runner)
+        site = web.TCPSite(runner, host=self.host, port=self.port)
         loop.run_until_complete(site.start())
 
 
