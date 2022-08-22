@@ -20,7 +20,6 @@ log.info("polling sleep=%ss" % polling_sleep)
 log.info("Starting temscripting Microscope HTTP Server with "
          "Websocket Events version %s..." % __version__)
 try:
-    # start remote server with events on localhost with default port 8080
     microscope = Microscope()
     temscripting_server = server_with_events.MicroscopeServerWithEvents(
         microscope=microscope, host="0.0.0.0", port=port)

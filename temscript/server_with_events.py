@@ -32,21 +32,20 @@ class MicroscopeServerWithEvents:
     connection.
 
     HTTP-URLs are supposed to follow the format
-        http://127.0.0.1:8080/v1/...
+        http://127.0.0.1:7351/v1/...
     Websocket connections are initialized via the websocket URL
-        ws://127.0.0.1:8080/ws/
+        ws://127.0.0.1:7351/ws/
     :param host IP the webserver is running under. Default is "0.0.0.0"
                 (run on all interfaces)
     :type host str
-    :param port Port the webserver is running under. Default is "8080"
-                (default HTTP-port)
+    :param port Port the webserver is running under. Default is "7351"
     :type port int
     :param microscope the Microscope to use (either NullMicroscope()
                 or Microscope())
     :type microscope Microscope
     """
 
-    def __init__(self, microscope, host="0.0.0.0", port=8080):
+    def __init__(self, microscope, host="0.0.0.0", port=7351):
         self.host = host
         self.port = port
         self.microscope = microscope
@@ -406,8 +405,8 @@ class MicroscopeServerWithEvents:
         log.info("Starting HTTP+websocket server with events under host=%s, port=%s" % (self.host, self.port))
         app = web.Application()
         # add routes for
-        # - HTTP-GET/PUT, e.g. http://127.0.0.1:8080/v1/projection_mode
-        # - websocket connection ws://127.0.0.1:8080/ws/v1
+        # - HTTP-GET/PUT, e.g. http://127.0.0.1:7351/v1/projection_mode
+        # - websocket connection ws://127.0.0.1:7351/ws/v1
         app.add_routes([web.get('/ws/v1', self.websocket_handler_v1),  #
                         web.get(r'/v1/{name:.+}', self.http_get_handler_v1),
                         web.put(r'/v1/{name:.+}', self.http_put_handler_v1),
@@ -618,7 +617,6 @@ def configure_server():
     else:
         # if silent does not exist in config: keep value None!
         if "silent" not in config:
-            # HTTP+Websocket server default port is 8080
             config["silent"] = True
         silent = config["silent"]
 
@@ -630,14 +628,13 @@ def configure_server():
     if silent is not None and silent:
         log.info("Starting server silently.")
 
-    port=8080
     if args.port is not None:
         # command line argument for port wins over config file
         port = args.port
     else:
         if "port" not in config:
-            # HTTP+Websocket server default port is 8080
-            config["port"] = 8080
+            # HTTP+Websocket server default port
+            config["port"] = 7351
         port = config["port"]
     log.debug("Starting server on port: %s", port)
 
