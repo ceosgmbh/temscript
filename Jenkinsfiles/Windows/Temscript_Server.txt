@@ -23,7 +23,7 @@ pipeline {
                     ]], 
                     userRemoteConfigs: [[
                         credentialsId: 'bobrd',
-                        url: 'https://github.com/christian-at-ceos/temscript/'
+                        url: env.GIT_URL
                     ]]
                 ])
             }
