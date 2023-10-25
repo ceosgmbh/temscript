@@ -57,34 +57,6 @@ def seperate_modules_and_inits(src_path, cython_packages):
     return modules, inits
 
 
-def blacklist_unwanted_modules(module_name, whitelist):
-    """
-    Walk recursively through a package and put all modules on a blacklist which
-    are part of a package not listed in whitelist.
-
-    :param module_name: name of the base module
-    :param whitelist: iterable of package names
-    :return: iterable of blacklisted module name
-    """
-    if module_name in whitelist:
-        blacklist = []
-    else:
-        blacklist = [module_name]
-    try:
-        spec = importlib.util.find_spec(module_name)
-    except ImportError:
-        return blacklist
-    if spec is not None and spec.submodule_search_locations is not None:
-        sub_modules = pkgutil.iter_modules(
-            spec.submodule_search_locations, prefix=module_name+'.')
-        for res in sub_modules:
-            if res.ispkg:
-                blacklist += blacklist_unwanted_modules(res.name, whitelist)
-            elif module_name not in whitelist:
-                blacklist.append(res.name)
-    return blacklist
-
-
 class QtBuild(build_py):
     def run(self):
         build_py.run(self)
