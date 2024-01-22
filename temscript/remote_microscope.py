@@ -294,8 +294,8 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/convergence_angle")
         return body
 
-    def set_convergence_angle(self, illuminated_area):
-        content = json.dumps(illuminated_area).encode("utf-8")
+    def set_convergence_angle(self, convergence_angle):
+        content = json.dumps(convergence_angle).encode("utf-8")
         self._request("PUT", "/v1/convergence_angle", body=content, accepted_response=[200, 204],
                       headers={"Content-Type": "application/json"})
 

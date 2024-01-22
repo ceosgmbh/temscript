@@ -157,7 +157,7 @@ def main(product_name, description, upgrade_code, scripts, packages, includes,
         'author': 'CEOS GmbH',
         'author_email': 'info@ceos-gmbh.de',
         'long_description': description,
-        'version': '2.1.1', ###getVersion(debug=True).release,
+        'version': '2.1.2', ###getVersion(debug=True).release,
         'url': 'http://ceos-gmbh.de/',
         'data_files': data_files,
         'cmdclass': {
