@@ -151,6 +151,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_illumination_mode_string()
         elif endpoint == "illuminated_area":
             response = self.server.microscope.get_illuminated_area()
+        elif endpoint == "convergence_angle":
+            response = self.server.microscope.get_convergence_angle()
         elif endpoint == "condenser_mode":
             response = self.server.microscope.get_condenser_mode()
         elif endpoint == "condenser_mode_string":
@@ -231,6 +233,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_df_mode(decoded_content)
         elif endpoint == "illuminated_area":
             self.server.microscope.set_illuminated_area(decoded_content)
+        elif endpoint == "convergence_angle":
+            self.server.microscope.set_convergence_angle(decoded_content)
         elif endpoint == "projection_mode":
             self.server.microscope.set_projection_mode(decoded_content)
         elif endpoint == "magnification_index":

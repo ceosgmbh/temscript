@@ -50,6 +50,7 @@ class NullMicroscope(object):
         self._illumination_mode = 0
         self._illuminated_area = 0.0
         self._condenser_mode = 1
+        self._convergence_angle = 0.1
         self._spot_size_index = 3
         self._magnification_index = 10
         self._stem_magnification = 5000.0
@@ -265,6 +266,12 @@ class NullMicroscope(object):
 
     def get_condenser_mode_string(self):
         return CondenserMode(self._condenser_mode).name
+
+    def get_convergence_angle(self):
+        return self._convergence_angle
+
+    def set_convergence_angle(self, convergence_angle):
+        self._convergence_angle = convergence_angle
 
     def get_spot_size_index(self):
         return self._spot_size_index
