@@ -148,6 +148,8 @@ class MicroscopeServerWithEvents:
             response = self.microscope.get_condenser_mode()
         elif command == "condenser_mode_string":
             response = self.microscope.get_condenser_mode_string()
+        elif command == "convergence_angle":
+            response = self.microscope.get_convergence_angle()
         elif command == "spot_size_index":
             response = self.microscope.get_spot_size_index()
         elif command == "magnification_index":
@@ -256,6 +258,8 @@ class MicroscopeServerWithEvents:
             self.microscope.set_df_mode(json_content)
         elif command == "illuminated_area":
             self.microscope.set_illuminated_area(json_content)
+        elif command == "convergence_angle":
+            self.microscope.set_convergence_angle(json_content)
         elif command == "projection_mode":
             self.microscope.set_projection_mode(json_content)
         elif command == "magnification_index":
@@ -554,7 +558,7 @@ class MicroscopeEventPublisher:
                     all_results[get_command] = result
                 except Exception as exc:
                     log.exception("TEMScripting method '{}' failed "
-                        "while polling: %s" % (get_command, exc))
+                        "while polling: %s %s" % (get_command, exc))
             await self.microscope_server.change_microscope_state(all_results)
 
         except Exception as exc:
