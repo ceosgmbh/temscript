@@ -690,7 +690,15 @@ class Microscope(object):
 
     def get_lens_program(self):
         """
-        Return current lens program ("EFTEM" or "REGULAR", T5984).
+        Return current lens program as int (1: "REGULAR", 2: "EFTEM", T5984).
+
+        .. versionadded:: 2.1.3
+        """
+        return LensProg(self._tem_projection.LensProgram)
+
+    def get_lens_program_string(self):
+        """
+        Return current lens program as string ("EFTEM" or "REGULAR", T5984).
 
         .. versionadded:: 2.1.3
         """

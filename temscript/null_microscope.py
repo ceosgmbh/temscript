@@ -47,7 +47,7 @@ class NullMicroscope(object):
         self._diffraction_shift = np.zeros(2, dtype=float)
         self._projection_sub_mode = ProjectionSubMode.SA
         self._projection_mode = ProjectionMode.IMAGING
-        self._lens_program = LensProg.REGULAR
+        self._lens_program = LensProg.EFTEM
         self._illumination_mode = 0
         self._illuminated_area = 0.0
         self._condenser_mode = 1
@@ -258,6 +258,9 @@ class NullMicroscope(object):
 
     def get_lens_program(self):
         return LensProg(self._lens_program)
+
+    def get_lens_program_string(self):
+        return LensProg(self._lens_program).name
 
     def set_lens_program(self, lens_program):
         lens_program = _parse_enum(LensProg, lens_program)

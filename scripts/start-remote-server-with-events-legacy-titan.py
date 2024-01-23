@@ -33,7 +33,7 @@ try:
         # for meta data key 'condenser.mode'
         "instrument_mode_string": (str, 1),  # "TEM"/"STEM"
         "illumination_mode": (int, 1),  # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
-        "lens_program": (int, 1),  # e.g., 1: ("REGULAR"), 2: ("EFTEM") (T5984)
+        "lens_program_string": (str, 1), # "REGULAR" or "EFTEM" (T5984)
         "df_mode_string": (str, 1),  # e.g., "CARTESIAN", "OFF"
         "spot_size_index": (int, 1),  # e.g., 3
         "condenser_mode_string": (str, 1),  # e.g., "PROBE"

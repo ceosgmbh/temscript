@@ -35,7 +35,8 @@ try:
         "df_mode_string": (str, 1),  # e.g., "CARTESIAN", "OFF"
         "spot_size_index": (int, 1),  # e.g., 3
         "condenser_mode_string": (str, 1),  # e.g., "PROBE"
-        "lens_program": (str, 1),  # e.g., 1: ("REGULAR"), 2: ("EFTEM") (T5984)
+        "lens_program_string": (str, 1), # "REGULAR" or "EFTEM" (T5984)
+        # for meta data key "objective.mode -> projector.camera_length"
         "convergence_angle": (float, 1),  # e.g., 0.01, in rad (T5984)
         "beam_blanked": (bool, 1),  # True, False
         # for meta data key 'electron_gun.voltage'

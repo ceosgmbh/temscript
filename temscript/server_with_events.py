@@ -140,6 +140,8 @@ class MicroscopeServerWithEvents:
             response = self.microscope.get_projection_mode_type_string()
         elif command == "lens_program":
             response = self.microscope.get_lens_program()
+        elif command == "lens_program_string":
+            response = self.microscope.get_lens_program_string()
         elif command == "illumination_mode":
             response = self.microscope.get_illumination_mode()
         elif command == "illumination_mode_string":

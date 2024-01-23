@@ -147,6 +147,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_projection_mode_type_string()
         elif endpoint == "lens_program":
             response = self.server.microscope.get_lens_program()
+        elif endpoint == "lens_program_string":
+            response = self.server.microscope.get_lens_program_string()
         elif endpoint == "illumination_mode":
             response = self.server.microscope.get_illumination_mode()
         elif endpoint == "illumination_mode_string":
