@@ -199,6 +199,11 @@ The classical interface
         (read/write) *float* Illuminated area (meters? Is diameter meant? still to check). Requires parallel
         condensor mode. (Available only on Titan).
 
+    .. attribute:: ConvergenceAngle
+
+        (read/write) *float* The convergence angle (in radians). Accessible only
+        in Probe mode.
+
     .. attribute:: ProbeDefocus
 
         (read/write) *float* Probe defocus (meters) Requires probe condensor mode.

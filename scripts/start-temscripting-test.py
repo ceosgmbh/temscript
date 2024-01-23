@@ -42,6 +42,9 @@ print("illuminationMode=%s" % illuminationMode)
 illuminatedArea = illumination.IlluminatedArea
 print("illuminatedArea=%s" % illuminatedArea)
 
+convergenceAngle = illumination.ConvergenceAngle
+print("convergenceAngle=%s" % convergenceAngle)
+
 dfMode = illumination.DFMode
 print("dfMode=%s" % dfMode)
 
