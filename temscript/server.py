@@ -145,6 +145,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             response = self.server.microscope.get_projection_mode_string()
         elif endpoint == "projection_mode_type_string":
             response = self.server.microscope.get_projection_mode_type_string()
+        elif endpoint == "lens_program":
+            response = self.server.microscope.get_lens_program()
         elif endpoint == "illumination_mode":
             response = self.server.microscope.get_illumination_mode()
         elif endpoint == "illumination_mode_string":
@@ -237,6 +239,8 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_convergence_angle(decoded_content)
         elif endpoint == "projection_mode":
             self.server.microscope.set_projection_mode(decoded_content)
+        elif endpoint == "lens_program":
+            self.server.microscope.set_lens_program(decoded_content)
         elif endpoint == "magnification_index":
             self.server.microscope.set_magnification_index(decoded_content)
         elif endpoint == "stem_magnification":

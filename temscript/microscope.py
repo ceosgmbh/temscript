@@ -568,6 +568,7 @@ class Microscope(object):
         """
         :return Return the convergence angle (in radians). Accessible only
                 in Probe mode. Type: double
+        .. versionadded:: 2.1.2
         """
         return self._tem_illumination.ConvergenceAngle
 
@@ -577,6 +578,7 @@ class Microscope(object):
                 in Probe mode. Type: double
         :param convergence_angle the convergence angle (in radians).
         :type convergence_angle double
+        .. versionadded:: 2.1.2
         """
         self._tem_illumination.ConvergenceAngle = convergence_angle
 
@@ -685,6 +687,26 @@ class Microscope(object):
         .. versionadded:: 1.0.15
         """
         return ProjectionMode(self._tem_projection.Mode).name
+
+    def get_lens_program(self):
+        """
+        Return current lens program ("EFTEM" or "REGULAR", T5984).
+
+        .. versionadded:: 2.1.3
+        """
+        return LensProg(self._tem_projection.LensProgram).name
+
+    def set_lens_program(self, lens_program):
+        """
+        Set projection mode.
+
+        :param lens_program: LensProg: "EFTEM" or "REGULAR" (T5984)
+        :type lens_program: str
+
+        .. versionadded:: 2.1.3
+        """
+        mode = _parse_enum(LensProg, lens_program)
+        self._tem_projection.LensProgram = lens_program
 
     def get_magnification_index(self):
         """

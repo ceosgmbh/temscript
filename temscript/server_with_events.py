@@ -138,6 +138,8 @@ class MicroscopeServerWithEvents:
             response = self.microscope.get_projection_mode_string()
         elif command == "projection_mode_type_string":
             response = self.microscope.get_projection_mode_type_string()
+        elif command == "lens_program":
+            response = self.microscope.get_lens_program()
         elif command == "illumination_mode":
             response = self.microscope.get_illumination_mode()
         elif command == "illumination_mode_string":
@@ -672,10 +674,12 @@ if __name__ == '__main__':
     tem_scripting_method_config = {
         # for meta data key 'condenser.mode'
         "instrument_mode_string": (str, 1),     # "TEM"/"STEM"
-        "illumination_mode":      (int, 1),    # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
+        "illumination_mode":      (int, 1),     # e.g., 0 ("NANOPROBE"), 1: ("MICROPROBE")
+        "lens_program": (int, 1),               # e.g., 1: ("REGULAR"), 2: ("EFTEM") (T5984)
         "df_mode_string": (str, 1),             # e.g., "CARTESIAN", "OFF"
         "spot_size_index": (int, 1),            # e.g., 3
         "condenser_mode_string": (str, 1),      # e.g., "PROBE"
+        "convergence_angle": (float, 1),        # e.g., 0.01, in rad (T5984)
         "beam_blanked": (bool, 1),              # True, False
         # for meta data key 'electron_gun.voltage'
         "voltage": (float, 1),                  # e.g., "200"

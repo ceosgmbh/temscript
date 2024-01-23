@@ -273,6 +273,15 @@ class RemoteMicroscope(object):
         response, body = self._request("GET", "/v1/projection_mode_type_string")
         return body
 
+    def get_lens_program(self):
+        response, body = self._request("GET", "/v1/lens_program")
+        return body
+
+    def set_lens_program(self, lens_program):
+        content = json.dumps(lens_program).encode("utf-8")
+        self._request("PUT", "/v1/lens_program", body=content, accepted_response=[200, 204],
+                      headers={"Content-Type": "application/json"})
+
     def get_illumination_mode(self):
         response, body = self._request("GET", "/v1/illumination_mode")
         return body

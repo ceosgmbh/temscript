@@ -36,6 +36,7 @@ try:
         "df_mode_string": (str, 1),             # e.g., "CARTESIAN", "OFF"
         "spot_size_index": (int, 1),            # e.g., 3
         "condenser_mode_string": (str, 1),      # e.g., "PROBE"
+        "lens_program": (int, 1),               # e.g., 1: ("REGULAR"), 2: ("EFTEM") (T5984)
         "convergence_angle": (float, 1),        # e.g., 0.01, in rad (T5984)
         "beam_blanked": (bool, 1),              # True, False
         # for meta data key 'electron_gun.voltage'
