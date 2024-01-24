@@ -262,8 +262,6 @@ class MicroscopeServerWithEvents:
             self.microscope.set_df_mode(json_content)
         elif command == "illuminated_area":
             self.microscope.set_illuminated_area(json_content)
-        elif command == "convergence_angle":
-            self.microscope.set_convergence_angle(json_content)
         elif command == "projection_mode":
             self.microscope.set_projection_mode(json_content)
         elif command == "magnification_index":

@@ -572,16 +572,6 @@ class Microscope(object):
         """
         return self._tem_illumination.ConvergenceAngle
 
-    def set_convergence_angle(self, convergence_angle):
-        """
-        Set the convergence angle (in radians). Accessible only
-                in Probe mode. Type: double
-        :param convergence_angle the convergence angle (in radians).
-        :type convergence_angle double
-        .. versionadded:: 2.1.2
-        """
-        self._tem_illumination.ConvergenceAngle = convergence_angle
-
     def get_condenser_mode(self):
         """
         Return the condenser mode as an integer.

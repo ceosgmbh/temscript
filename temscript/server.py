@@ -237,8 +237,6 @@ class MicroscopeHandler(BaseHTTPRequestHandler):
             self.server.microscope.set_df_mode(decoded_content)
         elif endpoint == "illuminated_area":
             self.server.microscope.set_illuminated_area(decoded_content)
-        elif endpoint == "convergence_angle":
-            self.server.microscope.set_convergence_angle(decoded_content)
         elif endpoint == "projection_mode":
             self.server.microscope.set_projection_mode(decoded_content)
         elif endpoint == "lens_program":

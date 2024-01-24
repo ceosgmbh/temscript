@@ -281,9 +281,6 @@ class NullMicroscope(object):
     def get_convergence_angle(self):
         return self._convergence_angle
 
-    def set_convergence_angle(self, convergence_angle):
-        self._convergence_angle = convergence_angle
-
     def get_spot_size_index(self):
         return self._spot_size_index
 
