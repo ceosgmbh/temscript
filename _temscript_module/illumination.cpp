@@ -66,6 +66,7 @@ static PyGetSetDef Illumination_getset[] = {
     {"CondenserMode",       (getter)&Illumination_get_CondenserMode, (setter)&Illumination_set_CondenserMode, NULL, NULL},
     {"IlluminatedArea",     (getter)&Illumination_get_IlluminatedArea, NULL, NULL, NULL},
     {"ProbeDefocus",        (getter)&Illumination_get_ProbeDefocus, NULL, NULL, NULL},
+    {"ConvergenceAngle",    (getter)&Illumination_get_ConvergenceAngle, (setter)&Illumination_set_ConvergenceAngle, NULL, NULL},
     {"StemMagnification",   (getter)&Illumination_get_StemMagnification, (setter)&Illumination_set_StemMagnification, NULL, NULL},
     {"StemRotation",        (getter)&Illumination_get_StemRotation, (setter)&Illumination_set_StemRotation, NULL, NULL},
     {NULL}  /* Sentinel */
